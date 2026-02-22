@@ -1,0 +1,11 @@
+C4Context
+    title Diagram kontenerów (C4) - Gamelog App
+    Person(user, "Użytkownik", "Zarządza swoimi grami")
+    Enterprise_Boundary(c1, "System Cloud Task Manager") {
+        Container(webApp, "Frontend (React 19)", "Vite, HTTPS", "Interfejs użytkownika")
+        Container(api, "Backend (API)", ".NET 9", "Logika biznesowa, REST API")
+        ContainerDb(db, "Baza danych (SQL)", "Azure SQL Serverless", "Przechowuje dane i zadania")
+    }
+    Rel(user, webApp, "Korzysta z", "HTTPS")
+    Rel(webApp, api, "Wysyła zapytania", "JSON/HTTPS")
+    Rel(api, db, "Odczytuje/Zapisuje", "T-SQL / Port 1433")
