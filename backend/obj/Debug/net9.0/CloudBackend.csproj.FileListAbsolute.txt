@@ -1,0 +1,9 @@
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.csproj.AssemblyReference.cache
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.AssemblyInfoInputs.cache
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.AssemblyInfo.cs
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.csproj.CoreCompileInputs.cache
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\vdi-terminal\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.sourcelink.json
