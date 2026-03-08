@@ -15,6 +15,6 @@ Ten projekt został zaplanowany z myślą o usługach PaaS (Platform as a Servic
 * [x] **Artefakt 1:** Zaplanowano strukturę folderów i diagram C4 (dostępny w `/docs`).
 * [x] **Artefakt 2:** Konfiguracja środowiska Docker.
 * [x] **Artefakt 3:** Działająca warstwa prezentacji (React + Vite w Dockerze)
-* [ ] **Artefakt 4:** Działająca warstwa logiki backendu (.NET 9 + SQL Connection)
+* [x] **Artefakt 4:** Działająca warstwa logiki backendu (.NET 9 + SQL Connection)
  
 > **Informacja:** Ten plik będzie ewoluował. W kolejnych etapach dodamy tutaj sekcje 'Quick Start', opis zmiennych środowiskowych oraz instrukcję wdrożenia (CI/CD).

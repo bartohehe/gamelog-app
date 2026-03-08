@@ -1,6 +1,6 @@
 using CloudBackend.Data;
-using Microsoft.EntityFrameworkCore;
 using CloudBackend.Models;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 // --- SEKCJA USŁUG (Dependency Injection) ---
 // 1. Rejestracja Kontrolerów (potrzebne, aby nasze API działało)
@@ -19,7 +19,7 @@ options.AddDefaultPolicy(policy => {
 policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
-    });
+});
 });
 var app = builder.Build();
 // --- AUTOMATYCZNE TWORZENIE BAZY I DANYCH ---
