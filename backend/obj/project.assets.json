@@ -5139,7 +5139,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\admstud\\.nuget\\packages\\": {}
+    "C:\\Users\\student-wroclaw\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -5147,11 +5147,11 @@
       "projectUniqueName": "C:\\Users\\student-wroclaw\\gamelog-app\\backend\\CloudBackend.csproj",
       "projectName": "CloudBackend",
       "projectPath": "C:\\Users\\student-wroclaw\\gamelog-app\\backend\\CloudBackend.csproj",
-      "packagesPath": "C:\\Users\\admstud\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\student-wroclaw\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\student-wroclaw\\gamelog-app\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\admstud\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\student-wroclaw\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
