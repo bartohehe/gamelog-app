@@ -1,4 +1,4 @@
-version: "3.9"
+
 services:
   # Warstwa Prezentacji (React)
   frontend:
@@ -28,13 +28,20 @@ services:
   cloud-db:
     image: mcr.microsoft.com/azure-sql-edge
     container_name: cloud-db
+    restart: always
     environment:
       SA_PASSWORD: "StrongPassword123!"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
     networks:
       - cloud-network
+
+volumes:
+  sql-data:
+
 networks:
   cloud-network:
     driver: bridge

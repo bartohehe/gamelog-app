@@ -30,7 +30,7 @@ try
 {
 var context = services.GetRequiredService<AppDbContext>();
 // 1. Tworzy bazę i tabele, jeśli ich nie ma
-context.Database.EnsureCreated();
+//context.Database.EnsureCreated();
 // 2. Dodaje startowe dane, jeśli tabela jestpusta (opcjonalne, alefajne)
 if (!context.Tasks.Any())
 {
