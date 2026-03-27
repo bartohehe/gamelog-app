@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\vdi-terminal\\Desktop\\gamelog-app\\backend\\CloudBackend.csproj": {}
+    "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\vdi-terminal\\Desktop\\gamelog-app\\backend\\CloudBackend.csproj": {
+    "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\vdi-terminal\\Desktop\\gamelog-app\\backend\\CloudBackend.csproj",
+        "projectUniqueName": "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj",
         "projectName": "CloudBackend",
-        "projectPath": "C:\\Users\\vdi-terminal\\Desktop\\gamelog-app\\backend\\CloudBackend.csproj",
-        "packagesPath": "C:\\Users\\vdi-terminal\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\vdi-terminal\\Desktop\\gamelog-app\\backend\\obj\\",
+        "projectPath": "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj",
+        "packagesPath": "C:\\Users\\barto\\.nuget\\packages\\",
+        "outputPath": "E:\\Projekty\\gamelog-app\\backend\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\vdi-terminal\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\barto\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -44,6 +50,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.13, )"
@@ -56,9 +70,17 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.3.2, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[7.2.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.3.2, )"
             }
           },
           "imports": [
@@ -80,7 +102,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

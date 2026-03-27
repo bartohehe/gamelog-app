@@ -1,40 +1,62 @@
 version: "3.9"
+
 services:
-  # Warstwa Prezentacji (React)
+  # ─── Presentation Layer (React + Nginx) ───────────────────────────────────
   frontend:
     build: ./frontend
-    container_name: cloud-frontend
+    container_name: gamelog-frontend
     ports:
       - "8080:80"
+    environment:
+      - VITE_API_URL=http://localhost:8081/api
     networks:
-      - cloud-network
+      - gamelog-network
     depends_on:
       - backend
-  # Warstwa Logiki (.NET 9)
+
+  # ─── Business Logic Layer (.NET 9) ────────────────────────────────────────
   backend:
     build: ./backend
-    container_name: cloud-backend
+    container_name: gamelog-backend
     ports:
-      - "8081:8080" # Mapujemy port 8080 kontenera (standard .NET 9) na 8081 hosta
+      - "8081:8080"
     environment:
       - ASPNETCORE_HTTP_PORTS=8080
-      # UWAGA: Hasło w tekście jawnym zostanie zabezpieczone później, ale dla celów demonstracyjnych jest tutaj umieszczone. W praktyce należy używać zmiennych środowiskowych lub menedżerów sekretów.
-      - ConnectionStrings__DefaultConnection=Server=cloud-db;Database=CloudAppDb;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True
+      - ConnectionStrings__DefaultConnection=Server=gamelog-db;Database=GameLogDb;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True
+      - Jwt__Key=GameLogSecretKey_MustBe32CharsMinimum_ChangeInProd!
+      # Add your API keys below (or use a .env file / Azure Key Vault in production)
+      - ExternalApis__Rawg__ApiKey=${RAWG_API_KEY:-}
+      - ExternalApis__Steam__ApiKey=${STEAM_API_KEY:-}
+      - ExternalApis__Riot__ApiKey=${RIOT_API_KEY:-}
     networks:
-      - cloud-network
+      - gamelog-network
     depends_on:
-      - cloud-db
-  # Warstwa Danych (SQL Edge)
-  cloud-db:
+      gamelog-db:
+        condition: service_healthy
+
+  # ─── Data Layer (Azure SQL Edge – local dev) ──────────────────────────────
+  gamelog-db:
     image: mcr.microsoft.com/azure-sql-edge
-    container_name: cloud-db
+    container_name: gamelog-db
     environment:
       SA_PASSWORD: "StrongPassword123!"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
     networks:
-      - cloud-network
+      - gamelog-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P StrongPassword123! -Q 'SELECT 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  sqldata:
+
 networks:
-  cloud-network:
+  gamelog-network:
     driver: bridge

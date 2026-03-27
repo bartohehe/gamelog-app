@@ -1,63 +1,94 @@
+using System.Text;
 using CloudBackend.Data;
-using CloudBackend.Models;
+using CloudBackend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
-// --- SEKCJA USŁUG (Dependency Injection) ---
-// 1. Rejestracja Kontrolerów (potrzebne, aby nasze API działało)
+
 builder.Services.AddControllers();
-// 2. Dokumentacja API (Swagger/OpenAPI)
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-// 3. Pobranie Connection Stringa (zmiennej środowiskowej z Dockera)
+
+// Swagger with JWT Bearer support
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "GameLog API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization. Enter: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// EF Core – Azure SQL / SQL Server
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-// 4. Rejestracja bazy danych MS SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseSqlServer(connectionString));
-// 5. Konfiguracja CORS - pozwala Reactowi(port 8080) na dostęp do API
-builder.Services.AddCors(options => {
-options.AddDefaultPolicy(policy => {
-policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+    options.UseSqlServer(connectionString));
+
+// JWT
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? "GameLogSecretKey_MustBe32CharsMin!!";
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// CORS – allow React frontend
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
-});
+
+// Application services
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddHttpClient<RawgService>();
+builder.Services.AddHttpClient<SteamService>();
+builder.Services.AddHttpClient<RiotService>();
+
 var app = builder.Build();
-// --- AUTOMATYCZNE TWORZENIE BAZY I DANYCH ---
+
+// Auto-create DB tables on startup
 using (var scope = app.Services.CreateScope())
 {
-var services = scope.ServiceProvider;
-try
-{
-var context = services.GetRequiredService<AppDbContext>();
-// 1. Tworzy bazę i tabele, jeśli ich nie ma
-context.Database.EnsureCreated();
-// 2. Dodaje startowe dane, jeśli tabela jestpusta (opcjonalne, alefajne)
-if (!context.Tasks.Any())
-{
-            context.Tasks.AddRange(
-                new CloudTask { Name = "Zrobić kawę",IsCompleted = true },
-                new CloudTask { Name = "Uruchomić projekt w Dockerze",IsCompleted = false }
-            );
-            context.SaveChanges();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try { db.Database.EnsureCreated(); }
+    catch (Exception ex) { Console.WriteLine($"DB init error: {ex.Message}"); }
 }
-}
-catch (Exception ex)
-{
-Console.WriteLine($"Błąd podczas tworzenia bazy: {ex.Message}");
-}
-}
-// --- SEKCJA POTOKU HTTP (Middleware) ---
-// Uruchamiamy Swaggera zawsze w fazie deweloperskiej i testowej
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cloud API V1");
-    c.RoutePrefix = string.Empty;
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GameLog API V1");
+    c.RoutePrefix = "swagger";
 });
-// Ważne: W Dockerze często używamy HTTP wewnątrz sieci,
-// więc wyłączamy wymuszone przekierowanie naHTTPS dla uproszczenia nauki
-// app.UseHttpsRedirection();
+
 app.UseCors();
-// Mapowanie kontrolerów (to sprawi, że TasksController zacznie działać)
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();

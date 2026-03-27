@@ -1,8 +1,15 @@
-import axios from "axios";
- 
+import axios from 'axios';
+
 const api = axios.create({
-// Vite wymaga prefixu import.meta.env dla zmiennych z .env
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8081/api',
 });
- 
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export default api;
