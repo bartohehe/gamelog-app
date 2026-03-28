@@ -1,4 +1,3 @@
-
 services:
   # Warstwa Prezentacji (React)
   frontend:
