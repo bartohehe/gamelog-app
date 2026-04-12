@@ -18,5 +18,6 @@ Ten projekt został zaplanowany z myślą o usługach PaaS (Platform as a Servic
 * [x] **Artefakt 4:** Działająca warstwa logiki backendu (.NET 9 + SQL Connection)
 * [x] **Artefakt 5:** Trwałość danych
 * [x] **Artefakt 6:** Deploy do Azure
+* [x] **Artefakt 7:** Ustawienie Key Vault i tożsamości
  
 > **Informacja:** Ten plik będzie ewoluował. W kolejnych etapach dodamy tutaj sekcje 'Quick Start', opis zmiennych środowiskowych oraz instrukcję wdrożenia (CI/CD).
