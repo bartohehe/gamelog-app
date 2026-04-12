@@ -1,4 +1,5 @@
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.exe
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\publish\web.config
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\web.config
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\web.config
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\web.config
@@ -31,6 +32,13 @@ C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\pub
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\CloudBackend.deps.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\publish\CloudBackend.deps.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\TaskManager.Tests\obj\project.assets.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\TaskManager.Tests\obj\TaskManager.Tests.csproj.nuget.dgspec.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.runtimeconfig.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.pdb
@@ -81,6 +89,10 @@ C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\System.Security.Per
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\System.Text.Encodings.Web.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\System.Text.Json.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\System.Windows.Extensions.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\xunit.abstractions.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\xunit.assert.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\xunit.core.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\xunit.execution.dotnet.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\runtimes\unix\lib\net6.0\Microsoft.Data.SqlClient.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll

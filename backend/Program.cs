@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen();
 // Pobieramy Connection String. 
 // Jeśli jesteśmy w Azure, nazwa "DbConnectionString" zostanie automatycznie 
 // pobrana z Magazynu Kluczy dzięki powyższej konfiguracji.
-var connectionString = builder.Configuration["DbConnectionString"] 
+var connectionString = builder.Configuration["DbConnetionSrtring"] 
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Rejestracja bazy danych z mechanizmem ponawiania prób (Retry Logic)

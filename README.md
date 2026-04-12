@@ -19,5 +19,6 @@ Ten projekt został zaplanowany z myślą o usługach PaaS (Platform as a Servic
 * [x] **Artefakt 5:** Trwałość danych
 * [x] **Artefakt 6:** Deploy do Azure
 * [x] **Artefakt 7:** Ustawienie Key Vault i tożsamości
+* [ ] **Artefakt 8:** Stworzenie testów i połączenie z Github Actions
  
 > **Informacja:** Ten plik będzie ewoluował. W kolejnych etapach dodamy tutaj sekcje 'Quick Start', opis zmiennych środowiskowych oraz instrukcję wdrożenia (CI/CD).

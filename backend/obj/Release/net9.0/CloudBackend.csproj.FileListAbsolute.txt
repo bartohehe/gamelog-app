@@ -528,3 +528,15 @@ C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\CloudBackend.deps.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\publish\web.config
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\publish\CloudBackend.deps.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\TaskManager.Tests\obj\project.assets.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\TaskManager.Tests\obj\TaskManager.Tests.csproj.nuget.dgspec.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\xunit.abstractions.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\xunit.assert.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\xunit.core.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\xunit.execution.dotnet.dll
