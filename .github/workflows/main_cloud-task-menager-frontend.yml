@@ -45,6 +45,6 @@ jobs:
       - name: Deploy
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'cloud-task-manager-frontend'
+          app-name: 'cloud-task-menager-frontend'
           package: dist
           startup-command: "pm2 serve /home/site/wwwroot --no-daemon --spa"
