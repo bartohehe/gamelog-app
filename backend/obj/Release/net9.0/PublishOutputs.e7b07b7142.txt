@@ -1,4 +1,6 @@
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.exe
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\web.config
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\web.config
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\web.config
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\web.config
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\web.config
@@ -19,6 +21,16 @@ C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\pub
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\CloudBackend.deps.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\CloudBackend.deps.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\CloudBackend.deps.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.dll
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.runtimeconfig.json
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\publish\CloudBackend.pdb

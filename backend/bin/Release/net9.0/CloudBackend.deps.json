@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v9.0": {
       "CloudBackend/1.0.0": {
         "dependencies": {
+          "Azure.Core": "1.53.0",
           "Azure.Extensions.AspNetCore.Configuration.Secrets": "1.5.0",
           "Azure.Identity": "1.21.0",
           "Microsoft.AspNetCore.OpenApi": "9.0.13",

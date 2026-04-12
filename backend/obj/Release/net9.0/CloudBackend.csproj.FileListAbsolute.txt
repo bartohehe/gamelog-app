@@ -516,3 +516,15 @@ C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Release\net9.0\refint\C
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Release\net9.0\CloudBackend.pdb
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Release\net9.0\CloudBackend.genruntimeconfig.cache
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Release\net9.0\ref\CloudBackend.dll
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\web.config
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\appsettings.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\CloudBackend.deps.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\web.config
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\CloudBackend.deps.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\CloudBackend.runtimeconfig.json
+C:\Users\student-wroclaw\Desktop\gamelog-app\backend\bin\Release\net9.0\publish\publish\publish\publish\publish\CloudBackend.staticwebassets.endpoints.json
