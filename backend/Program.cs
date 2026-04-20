@@ -1,60 +1,97 @@
+using System.Text;
+using Azure.Identity;
 using CloudBackend.Data;
+using CloudBackend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Azure.Identity; // Potrzebne do DefaultAzureCredential
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- NOWA SEKCJA: INTEGRACJA Z MAGAZYNEM KLUCZY (KEY VAULT) ---
-// Jeśli aplikacja działa w chmurze (Production), pobieramy hasła z sejfu
 if (builder.Environment.IsProduction())
 {
     var vaultName = builder.Configuration["KeyVaultName"];
     if (!string.IsNullOrEmpty(vaultName))
     {
         var keyVaultEndpoint = new Uri($"https://{vaultName}.vault.azure.net/");
-        // DefaultAzureCredential automatycznie użyje Tożsamości Zarządzanej w Azure
         builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
     }
 }
 
-// --- SEKCJA USŁUG (Dependency Injection) ---
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
-// Pobieramy Connection String. 
-// Jeśli jesteśmy w Azure, nazwa "DbConnectionString" zostanie automatycznie 
-// pobrana z Magazynu Kluczy dzięki powyższej konfiguracji.
-var connectionString = builder.Configuration["DbConnetionSrtring"] 
+var connectionString = builder.Configuration["DbConnectionString"]
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Rejestracja bazy danych z mechanizmem ponawiania prób (Retry Logic)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString,
-        sqlOptions => sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorNumbersToAdd: null)
-    ));
+        sql => sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)));
 
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(policy => {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IRawgService, RawgService>();
+
+var jwtSecret = builder.Configuration["JwtSettings:Secret"]
+    ?? throw new InvalidOperationException("JwtSettings:Secret not configured.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
     });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 var app = builder.Build();
 
-// --- MIDDLEWARE ---
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cloud API V1");
-    c.RoutePrefix = string.Empty; 
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GameLog API V1");
+    c.RoutePrefix = string.Empty;
 });
+
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
