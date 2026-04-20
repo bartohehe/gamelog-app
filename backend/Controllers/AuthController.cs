@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
         var result = await _auth.RegisterAsync(dto);
         if (result == null)
             return Conflict(new { message = "Email already in use." });
-        return Ok(result);
+        return StatusCode(201, result);
     }
 
     [HttpPost("login")]
