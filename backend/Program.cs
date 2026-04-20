@@ -1,6 +1,5 @@
 using CloudBackend.Data;
 using Microsoft.EntityFrameworkCore;
-using CloudBackend.Models;
 using Azure.Identity; // Potrzebne do DefaultAzureCredential
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,27 +48,6 @@ builder.Services.AddCors(options => {
 
 var app = builder.Build();
 
-// --- AUTOMATYCZNE DANE STARTOWE ---
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<AppDbContext>();
-        if (!context.Tasks.Any())
-        {
-            context.Tasks.AddRange(
-                new CloudTask { Name = "Zrobić kawę", IsCompleted = true },
-                new CloudTask { Name = "Zabezpieczyć aplikację w Azure", IsCompleted = true }
-            );
-            context.SaveChanges();
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Błąd bazy: {ex.Message}");
-    }
-}
 // --- MIDDLEWARE ---
 app.UseSwagger();
 app.UseSwaggerUI(c =>
