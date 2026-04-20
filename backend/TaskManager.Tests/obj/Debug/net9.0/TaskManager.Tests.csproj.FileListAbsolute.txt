@@ -1,0 +1,6 @@
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\TaskManager.Tests\obj\Debug\net9.0\TaskManager.Tests.csproj.AssemblyReference.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\TaskManager.Tests\obj\Debug\net9.0\TaskManager.Tests.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\TaskManager.Tests\obj\Debug\net9.0\TaskManager.Tests.AssemblyInfoInputs.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\TaskManager.Tests\obj\Debug\net9.0\TaskManager.Tests.AssemblyInfo.cs
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\TaskManager.Tests\obj\Debug\net9.0\TaskManager.Tests.csproj.CoreCompileInputs.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\TaskManager.Tests\obj\Debug\net9.0\TaskManager.Tests.sourcelink.json

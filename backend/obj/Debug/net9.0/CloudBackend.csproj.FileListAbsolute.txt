@@ -597,3 +597,15 @@ C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Debug\net9.0\refint\Clo
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.pdb
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Debug\net9.0\CloudBackend.genruntimeconfig.cache
 C:\Users\student-wroclaw\Desktop\gamelog-app\backend\obj\Debug\net9.0\ref\CloudBackend.dll
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.csproj.AssemblyReference.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\rpswa.dswa.cache.json
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.AssemblyInfoInputs.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.AssemblyInfo.cs
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.csproj.CoreCompileInputs.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.MvcApplicationPartsAssemblyInfo.cs
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.MvcApplicationPartsAssemblyInfo.cache
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.sourcelink.json
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.dll
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\refint\CloudBackend.dll
+E:\Projekty\gamelog-app\.worktrees\gamelog-redesign\backend\obj\Debug\net9.0\CloudBackend.pdb

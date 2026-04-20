@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj": {}
+    "E:\\Projekty\\gamelog-app\\.worktrees\\gamelog-redesign\\backend\\CloudBackend.csproj": {}
   },
   "projects": {
-    "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj": {
+    "E:\\Projekty\\gamelog-app\\.worktrees\\gamelog-redesign\\backend\\CloudBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj",
+        "projectUniqueName": "E:\\Projekty\\gamelog-app\\.worktrees\\gamelog-redesign\\backend\\CloudBackend.csproj",
         "projectName": "CloudBackend",
-        "projectPath": "E:\\Projekty\\gamelog-app\\backend\\CloudBackend.csproj",
+        "projectPath": "E:\\Projekty\\gamelog-app\\.worktrees\\gamelog-redesign\\backend\\CloudBackend.csproj",
         "packagesPath": "C:\\Users\\barto\\.nuget\\packages\\",
-        "outputPath": "E:\\Projekty\\gamelog-app\\backend\\obj\\",
+        "outputPath": "E:\\Projekty\\gamelog-app\\.worktrees\\gamelog-redesign\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -62,6 +62,14 @@
               "target": "Package",
               "version": "[1.21.0, )"
             },
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.13, )"
@@ -76,6 +84,10 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[9.0.0, )"
@@ -83,6 +95,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[7.2.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.3.3, )"
             },
             "xunit": {
               "target": "Package",
