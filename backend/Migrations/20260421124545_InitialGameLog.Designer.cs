@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CloudBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260420222712_InitialGameLog")]
+    [Migration("20260421124545_InitialGameLog")]
     partial class InitialGameLog
     {
         /// <inheritdoc />
@@ -41,7 +41,7 @@ namespace CloudBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RawgId")
+                    b.Property<int>("IgdbId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ReleaseYear")
@@ -53,7 +53,7 @@ namespace CloudBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RawgId")
+                    b.HasIndex("IgdbId")
                         .IsUnique();
 
                     b.ToTable("Games");

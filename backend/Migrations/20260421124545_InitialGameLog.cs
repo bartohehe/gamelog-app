@@ -17,7 +17,7 @@ namespace CloudBackend.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RawgId = table.Column<int>(type: "int", nullable: false),
+                    IgdbId = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CoverImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReleaseYear = table.Column<int>(type: "int", nullable: true),
@@ -77,9 +77,9 @@ namespace CloudBackend.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Games_RawgId",
+                name: "IX_Games_IgdbId",
                 table: "Games",
-                column: "RawgId",
+                column: "IgdbId",
                 unique: true);
 
             migrationBuilder.CreateIndex(

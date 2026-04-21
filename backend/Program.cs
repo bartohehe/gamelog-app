@@ -50,7 +50,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sql => sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddHttpClient<IRawgService, RawgService>();
+builder.Services.AddHttpClient<IIgdbService, IgdbService>();
 
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]
     ?? throw new InvalidOperationException("JwtSettings:Secret not configured.");

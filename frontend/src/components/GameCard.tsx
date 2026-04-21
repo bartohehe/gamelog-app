@@ -5,7 +5,7 @@ import type { UserGameDto } from '../types';
 export default function GameCard({ game }: { game: UserGameDto }) {
   return (
     <Link
-      to={`/game/${game.rawgId}`}
+      to={`/game/${game.igdbId}`}
       className="bg-bg-card rounded-xl overflow-hidden border border-white/5 hover:border-accent-purple/40 transition-all hover:shadow-lg hover:shadow-accent-purple/10 flex flex-col"
     >
       <div className="relative">

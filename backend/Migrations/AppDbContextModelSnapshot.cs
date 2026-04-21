@@ -38,7 +38,7 @@ namespace CloudBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RawgId")
+                    b.Property<int>("IgdbId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ReleaseYear")
@@ -50,7 +50,7 @@ namespace CloudBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RawgId")
+                    b.HasIndex("IgdbId")
                         .IsUnique();
 
                     b.ToTable("Games");

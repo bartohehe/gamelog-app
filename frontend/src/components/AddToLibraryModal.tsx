@@ -29,7 +29,7 @@ export default function AddToLibraryModal({ game, onClose, onAdded }: Props) {
     setLoading(true);
     setError('');
     try {
-      const dto: AddToLibraryDto = { rawgId: game.rawgId, status, platform };
+      const dto: AddToLibraryDto = { igdbId: game.igdbId, status, platform };
       await addToLibrary(dto);
       onAdded();
       onClose();

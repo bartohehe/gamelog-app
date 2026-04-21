@@ -19,7 +19,7 @@ public class AppDbContext : DbContext
             .HasIndex(u => u.Username).IsUnique();
 
         modelBuilder.Entity<Game>()
-            .HasIndex(g => g.RawgId).IsUnique();
+            .HasIndex(g => g.IgdbId).IsUnique();
 
         modelBuilder.Entity<UserGame>()
             .HasOne(ug => ug.User)

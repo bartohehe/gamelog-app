@@ -55,7 +55,7 @@ export default function SearchPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {results.map(game => (
           <div
-            key={game.rawgId}
+            key={game.igdbId}
             className="bg-bg-card rounded-xl overflow-hidden border border-white/5 hover:border-accent-purple/40 transition-all flex flex-col"
           >
             {game.coverImageUrl ? (

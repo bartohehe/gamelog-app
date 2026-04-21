@@ -14,12 +14,12 @@ namespace CloudBackend.Controllers;
 public class LibraryController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IRawgService _rawg;
+    private readonly IIgdbService _igdb;
 
-    public LibraryController(AppDbContext context, IRawgService rawg)
+    public LibraryController(AppDbContext context, IIgdbService igdb)
     {
         _context = context;
-        _rawg = rawg;
+        _igdb = igdb;
     }
 
     private int GetUserId() =>
@@ -36,7 +36,7 @@ public class LibraryController : ControllerBase
             .Select(ug => new UserGameDto
             {
                 Id = ug.Id,
-                RawgId = ug.Game.RawgId,
+                IgdbId = ug.Game.IgdbId,
                 Title = ug.Game.Title,
                 CoverImageUrl = ug.Game.CoverImageUrl,
                 Status = ug.Status,
@@ -47,7 +47,6 @@ public class LibraryController : ControllerBase
                 UpdatedAt = ug.UpdatedAt
             })
             .ToListAsync();
-
         return Ok(items);
     }
 
@@ -55,8 +54,7 @@ public class LibraryController : ControllerBase
     public async Task<ActionResult<UserGameDto>> AddToLibrary(AddToLibraryDto dto)
     {
         var userId = GetUserId();
-
-        var game = await _rawg.GetOrCreateCachedGameAsync(dto.RawgId);
+        var game = await _igdb.GetOrCreateCachedGameAsync(dto.IgdbId);
 
         var exists = await _context.UserGames
             .AnyAsync(ug => ug.UserId == userId && ug.GameId == game.Id);
@@ -72,14 +70,13 @@ public class LibraryController : ControllerBase
             AddedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-
         _context.UserGames.Add(userGame);
         await _context.SaveChangesAsync();
 
         return Ok(new UserGameDto
         {
             Id = userGame.Id,
-            RawgId = game.RawgId,
+            IgdbId = game.IgdbId,
             Title = game.Title,
             CoverImageUrl = game.CoverImageUrl,
             Status = userGame.Status,
@@ -96,7 +93,6 @@ public class LibraryController : ControllerBase
         var item = await _context.UserGames
             .Include(ug => ug.Game)
             .FirstOrDefaultAsync(ug => ug.Id == id && ug.UserId == userId);
-
         if (item == null) return NotFound();
 
         item.Status = dto.Status;
@@ -104,13 +100,12 @@ public class LibraryController : ControllerBase
         item.Score = dto.Score;
         item.Review = dto.Review;
         item.UpdatedAt = DateTime.UtcNow;
-
         await _context.SaveChangesAsync();
 
         return Ok(new UserGameDto
         {
             Id = item.Id,
-            RawgId = item.Game.RawgId,
+            IgdbId = item.Game.IgdbId,
             Title = item.Game.Title,
             CoverImageUrl = item.Game.CoverImageUrl,
             Status = item.Status,
@@ -128,9 +123,7 @@ public class LibraryController : ControllerBase
         var userId = GetUserId();
         var item = await _context.UserGames
             .FirstOrDefaultAsync(ug => ug.Id == id && ug.UserId == userId);
-
         if (item == null) return NotFound();
-
         _context.UserGames.Remove(item);
         await _context.SaveChangesAsync();
         return NoContent();

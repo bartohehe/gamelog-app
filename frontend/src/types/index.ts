@@ -1,7 +1,7 @@
 export type GameStatus = 'Planned' | 'InProgress' | 'Completed' | 'Abandoned';
 
 export interface GameDto {
-  rawgId: number;
+  igdbId: number;
   title: string;
   coverImageUrl: string;
   releaseYear?: number;
@@ -10,7 +10,7 @@ export interface GameDto {
 
 export interface UserGameDto {
   id: number;
-  rawgId: number;
+  igdbId: number;
   title: string;
   coverImageUrl: string;
   status: GameStatus;
@@ -22,7 +22,7 @@ export interface UserGameDto {
 }
 
 export interface AddToLibraryDto {
-  rawgId: number;
+  igdbId: number;
   status: GameStatus;
   platform: string;
 }
@@ -50,7 +50,7 @@ export interface UserStatsDto {
 }
 
 export interface TopGameDto {
-  rawgId: number;
+  igdbId: number;
   title: string;
   coverImageUrl: string;
   averageScore: number;

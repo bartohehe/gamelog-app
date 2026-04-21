@@ -51,7 +51,7 @@ public class StatsController : ControllerBase
             .GroupBy(ug => ug.GameId)
             .Select(g => new TopGameDto
             {
-                RawgId = g.First().Game.RawgId,
+                IgdbId = g.First().Game.IgdbId,
                 Title = g.First().Game.Title,
                 CoverImageUrl = g.First().Game.CoverImageUrl,
                 AverageScore = g.Average(ug => ug.Score!.Value),

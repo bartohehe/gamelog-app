@@ -18,7 +18,7 @@ const STATUSES: { value: GameStatus; label: string }[] = [
 const PLATFORMS = ['PC', 'PS5', 'PS4', 'Xbox Series X', 'Xbox One', 'Nintendo Switch', 'Mobile', 'Inne'];
 
 export default function GameDetailPage() {
-  const { rawgId } = useParams<{ rawgId: string }>();
+  const { igdbId } = useParams<{ igdbId: string }>();
   const navigate = useNavigate();
   const [game, setGame] = useState<GameDto | null>(null);
   const [libraryItem, setLibraryItem] = useState<UserGameDto | null>(null);
@@ -32,13 +32,13 @@ export default function GameDetailPage() {
   });
 
   useEffect(() => {
-    if (!rawgId) return;
-    const id = Number(rawgId);
+    if (!igdbId) return;
+    const id = Number(igdbId);
 
     getGameById(id).then(setGame).catch(() => {});
 
     getLibrary().then(lib => {
-      const item = lib.find(g => g.rawgId === id) ?? null;
+      const item = lib.find(g => g.igdbId === id) ?? null;
       setLibraryItem(item);
       if (item) {
         setForm({
@@ -49,7 +49,7 @@ export default function GameDetailPage() {
         });
       }
     }).catch(() => {});
-  }, [rawgId]);
+  }, [igdbId]);
 
   const handleSave = async () => {
     if (!libraryItem) return;
@@ -203,7 +203,7 @@ export default function GameDetailPage() {
             setShowAddModal(false);
             // Reload library item
             getLibrary().then(lib => {
-              const item = lib.find(g => g.rawgId === Number(rawgId)) ?? null;
+              const item = lib.find(g => g.igdbId === Number(igdbId)) ?? null;
               setLibraryItem(item);
               if (item) setForm({ status: item.status, platform: item.platform, score: item.score, review: item.review ?? '' });
             }).catch(() => {});

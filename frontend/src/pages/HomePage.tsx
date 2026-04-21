@@ -76,8 +76,8 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {topGames.map(game => (
               <Link
-                key={game.rawgId}
-                to={isAuthenticated ? `/game/${game.rawgId}` : '/login'}
+                key={game.igdbId}
+                to={isAuthenticated ? `/game/${game.igdbId}` : '/login'}
                 className="bg-bg-card rounded-xl overflow-hidden border border-white/5 hover:border-accent-purple/40 transition-all group"
               >
                 <div className="h-32 bg-bg-primary flex items-center justify-center text-3xl">🎮</div>
@@ -91,7 +91,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Popular from RAWG */}
+      {/* Popular from IGDB */}
       {popularGames.length > 0 && (
         <section>
           <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
@@ -100,8 +100,8 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {popularGames.map(game => (
               <Link
-                key={game.rawgId}
-                to={isAuthenticated ? `/game/${game.rawgId}` : '/login'}
+                key={game.igdbId}
+                to={isAuthenticated ? `/game/${game.igdbId}` : '/login'}
                 className="bg-bg-card rounded-xl overflow-hidden border border-white/5 hover:border-accent-purple/40 transition-all group"
               >
                 {game.coverImageUrl ? (

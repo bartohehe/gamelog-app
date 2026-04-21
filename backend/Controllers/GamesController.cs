@@ -8,11 +8,11 @@ namespace CloudBackend.Controllers;
 [Route("api/[controller]")]
 public class GamesController : ControllerBase
 {
-    private readonly IRawgService _rawg;
+    private readonly IIgdbService _igdb;
 
-    public GamesController(IRawgService rawg)
+    public GamesController(IIgdbService igdb)
     {
-        _rawg = rawg;
+        _igdb = igdb;
     }
 
     [HttpGet("search")]
@@ -20,22 +20,17 @@ public class GamesController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(q))
             return BadRequest(new { message = "Query parameter 'q' is required." });
-
-        var results = await _rawg.SearchGamesAsync(q);
-        return Ok(results);
+        return Ok(await _igdb.SearchGamesAsync(q));
     }
 
     [HttpGet("popular")]
     public async Task<ActionResult<List<GameDto>>> Popular()
-    {
-        var results = await _rawg.GetPopularGamesAsync();
-        return Ok(results);
-    }
+        => Ok(await _igdb.GetPopularGamesAsync());
 
-    [HttpGet("{rawgId:int}")]
-    public async Task<ActionResult<GameDto>> GetById(int rawgId)
+    [HttpGet("{igdbId:int}")]
+    public async Task<ActionResult<GameDto>> GetById(int igdbId)
     {
-        var game = await _rawg.GetGameDetailsAsync(rawgId);
+        var game = await _igdb.GetGameDetailsAsync(igdbId);
         if (game == null) return NotFound();
         return Ok(game);
     }

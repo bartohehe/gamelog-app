@@ -22,7 +22,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=gamelog-db;Database=GameLog;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True
       - JwtSettings__Secret=local-docker-secret-key-minimum-32-characters!!
-      - ExternalApis__Rawg__ApiKey=${RAWG_API_KEY:-}
+      - ExternalApis__Igdb__ClientId=${IGDB_CLIENT_ID:-}
+      - ExternalApis__Igdb__ClientSecret=${IGDB_CLIENT_SECRET:-}
     networks:
       - gamelog-network
     depends_on:
