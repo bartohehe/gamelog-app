@@ -1,32 +1,36 @@
 services:
-  # Warstwa Prezentacji (React)
   frontend:
-    build: ./frontend
-    container_name: cloud-frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8081
+    container_name: gamelog-frontend
     ports:
       - "8080:80"
     networks:
-      - cloud-network
+      - gamelog-network
     depends_on:
       - backend
-  # Warstwa Logiki (.NET 9)
+
   backend:
     build: ./backend
-    container_name: cloud-backend
+    container_name: gamelog-backend
     ports:
-      - "8081:8080" # Mapujemy port 8080 kontenera (standard .NET 9) na 8081 hosta
+      - "8081:8080"
     environment:
       - ASPNETCORE_HTTP_PORTS=8080
-      # UWAGA: Hasło w tekście jawnym zostanie zabezpieczone później, ale dla celów demonstracyjnych jest tutaj umieszczone. W praktyce należy używać zmiennych środowiskowych lub menedżerów sekretów.
-      - ConnectionStrings__DefaultConnection=Server=cloud-db;Database=CloudAppDb;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=gamelog-db;Database=GameLog;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True
+      - JwtSettings__Secret=local-docker-secret-key-minimum-32-characters!!
+      - ExternalApis__Rawg__ApiKey=${RAWG_API_KEY:-}
     networks:
-      - cloud-network
+      - gamelog-network
     depends_on:
-      - cloud-db
-  # Warstwa Danych (SQL Edge)
-  cloud-db:
+      - gamelog-db
+
+  gamelog-db:
     image: mcr.microsoft.com/azure-sql-edge
-    container_name: cloud-db
+    container_name: gamelog-db
     restart: always
     environment:
       SA_PASSWORD: "StrongPassword123!"
@@ -36,11 +40,11 @@ services:
     volumes:
       - sql-data:/var/opt/mssql
     networks:
-      - cloud-network
+      - gamelog-network
 
 volumes:
   sql-data:
 
 networks:
-  cloud-network:
+  gamelog-network:
     driver: bridge
