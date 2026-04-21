@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  --color-bg-primary: #0F0E17;
+  --color-bg-card: #1A1828;
+  --color-accent-purple: #7C3AED;
+  --color-accent-gold: #F5A623;
+  --color-text-primary: #E8E8F0;
+  --color-status-planned: #3B82F6;
+  --color-status-inprogress: #7C3AED;
+  --color-status-completed: #10B981;
+  --color-status-abandoned: #6B7280;
+}
+
 * {
   box-sizing: border-box;
 }
