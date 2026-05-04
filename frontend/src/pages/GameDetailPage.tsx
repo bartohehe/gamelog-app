@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2 } from 'lucide-react';
 import { getGameById } from '../services/gamesService';
 import { getLibrary, updateLibraryItem, removeFromLibrary } from '../services/libraryService';
+import { useTheme } from '../contexts/ThemeContext';
+import Cover from '../components/Cover';
 import StatusBadge from '../components/StatusBadge';
 import ScoreSlider from '../components/ScoreSlider';
 import AddToLibraryModal from '../components/AddToLibraryModal';
@@ -17,9 +18,20 @@ const STATUSES: { value: GameStatus; label: string }[] = [
 
 const PLATFORMS = ['PC', 'PS5', 'PS4', 'Xbox Series X', 'Xbox One', 'Nintendo Switch', 'Mobile', 'Inne'];
 
+function getScoreLabel(score: number): string {
+  if (score >= 90) return 'Arcydzieło';
+  if (score >= 80) return 'Świetna';
+  if (score >= 70) return 'Dobra';
+  if (score >= 60) return 'Przeciętna';
+  if (score > 0) return 'Słaba';
+  return 'Brak oceny';
+}
+
 export default function GameDetailPage() {
   const { igdbId } = useParams<{ igdbId: string }>();
   const navigate = useNavigate();
+  const { t } = useTheme();
+
   const [game, setGame] = useState<GameDto | null>(null);
   const [libraryItem, setLibraryItem] = useState<UserGameDto | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -41,12 +53,7 @@ export default function GameDetailPage() {
       const item = lib.find(g => g.igdbId === id) ?? null;
       setLibraryItem(item);
       if (item) {
-        setForm({
-          status: item.status,
-          platform: item.platform,
-          score: item.score,
-          review: item.review ?? '',
-        });
+        setForm({ status: item.status, platform: item.platform, score: item.score, review: item.review ?? '' });
       }
     }).catch(() => {});
   }, [igdbId]);
@@ -70,138 +77,329 @@ export default function GameDetailPage() {
 
   if (!game) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: t.bg }}>
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            border: `2px solid ${t.accent}`,
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
-  return (
-    <main className="max-w-4xl mx-auto px-6 py-10">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-text-primary/50 hover:text-text-primary transition-colors mb-6 text-sm"
-      >
-        <ArrowLeft size={16} /> Wróć
-      </button>
+  const scoreColor = form.score
+    ? (form.score >= 80 ? '#22c55e' : form.score >= 60 ? '#f59e0b' : '#ef4444')
+    : t.textFaint;
 
-      {/* Game header */}
-      <div className="flex gap-6 mb-8">
-        {game.coverImageUrl ? (
-          <img src={game.coverImageUrl} alt={game.title} className="w-32 h-44 object-cover rounded-xl flex-shrink-0" />
-        ) : (
-          <div className="w-32 h-44 bg-bg-card rounded-xl flex items-center justify-center text-4xl flex-shrink-0">🎮</div>
-        )}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-text-primary">{game.title}</h1>
-          {game.releaseYear && <p className="text-text-primary/40 text-sm">{game.releaseYear}</p>}
-          {game.genres.length > 0 && (
-            <div className="flex gap-2 flex-wrap">
-              {game.genres.map(g => (
-                <span key={g} className="bg-white/5 text-text-primary/60 text-xs px-2.5 py-1 rounded-full border border-white/10">{g}</span>
-              ))}
-            </div>
-          )}
-          {libraryItem && <StatusBadge status={libraryItem.status} />}
+  return (
+    <div style={{ flex: 1, overflow: 'auto' }}>
+      {/* Hero background */}
+      <div style={{ position: 'relative', height: 280 }}>
+        <div style={{ position: 'absolute', inset: 0 }}>
+          <Cover title={game.title} coverImageUrl={game.coverImageUrl} style={{ borderRadius: 0 }} />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(to bottom, transparent 20%, ${t.bg} 100%)`,
+            }}
+          />
         </div>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            position: 'absolute',
+            top: 20,
+            left: 24,
+            background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 8,
+            color: '#fff',
+            padding: '6px 14px',
+            fontSize: 13,
+            cursor: 'pointer',
+          }}
+        >
+          ← Wróć
+        </button>
       </div>
 
-      {/* Not in library */}
-      {!libraryItem && (
-        <div className="bg-bg-card rounded-xl p-6 border border-white/10 text-center">
-          <p className="text-text-primary/50 mb-4">Ta gra nie jest jeszcze w Twojej bibliotece.</p>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="bg-accent-purple text-white px-6 py-2.5 rounded-lg hover:bg-accent-purple/80 transition-colors"
+      <div style={{ padding: '0 36px 36px', maxWidth: 860, marginTop: -60 }}>
+        {/* Game header */}
+        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+          <div
+            style={{
+              width: 110,
+              height: 145,
+              borderRadius: 10,
+              overflow: 'hidden',
+              border: `3px solid ${t.border}`,
+              flexShrink: 0,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            }}
           >
-            Dodaj do biblioteki
-          </button>
-        </div>
-      )}
-
-      {/* In library — edit form */}
-      {libraryItem && (
-        <div className="bg-bg-card rounded-xl p-6 border border-white/10 flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-text-primary">Moje dane</h2>
-            <button
-              onClick={handleRemove}
-              className="text-text-primary/30 hover:text-red-400 transition-colors flex items-center gap-1 text-sm"
-            >
-              <Trash2 size={14} /> Usuń
-            </button>
+            <Cover title={game.title} coverImageUrl={game.coverImageUrl} />
           </div>
-
-          {/* Status */}
-          <div>
-            <label className="text-sm text-text-primary/60 mb-2 block">Status</label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {STATUSES.map(s => (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, status: s.value }))}
-                  className={`py-2 px-3 rounded-lg text-sm font-medium transition-all border ${
-                    form.status === s.value
-                      ? 'bg-accent-purple border-accent-purple text-white'
-                      : 'bg-bg-primary border-white/10 text-text-primary/60 hover:border-accent-purple/50'
-                  }`}
+          <div style={{ flex: 1, paddingTop: 24 }}>
+            {libraryItem && (
+              <div style={{ marginBottom: 6 }}>
+                <StatusBadge status={libraryItem.status} />
+              </div>
+            )}
+            <h1
+              style={{
+                fontFamily: 'Syne, sans-serif',
+                fontSize: 28,
+                fontWeight: 700,
+                color: t.text,
+                marginBottom: 6,
+                lineHeight: 1.2,
+              }}
+            >
+              {game.title}
+            </h1>
+            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 12 }}>
+              {[game.releaseYear, game.genres.join(' · ')].filter(Boolean).join(' · ')}
+            </div>
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {game.genres.map(g => (
+                <span
+                  key={g}
+                  style={{
+                    fontSize: 11,
+                    background: t.tagBg,
+                    color: t.tagText,
+                    border: `1px solid ${t.tagText}30`,
+                    borderRadius: 20,
+                    padding: '2px 10px',
+                  }}
                 >
-                  {s.label}
-                </button>
+                  {g}
+                </span>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Platform */}
-          <div>
-            <label className="text-sm text-text-primary/60 mb-2 block">Platforma</label>
-            <select
-              value={form.platform}
-              onChange={e => setForm(f => ({ ...f, platform: e.target.value }))}
-              className="w-full bg-bg-primary border border-white/10 rounded-lg px-4 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-purple"
-            >
-              {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+        {/* Stats cards */}
+        {libraryItem && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, margin: '28px 0' }}>
+            {[
+              { label: 'Platforma', value: libraryItem.platform },
+              { label: 'Data dodania', value: new Date(libraryItem.addedAt).toLocaleDateString('pl-PL') },
+              { label: 'Status', value: libraryItem.status },
+            ].map(s => (
+              <div
+                key={s.label}
+                style={{
+                  background: t.bgCard,
+                  border: `1px solid ${t.border}`,
+                  borderRadius: 10,
+                  padding: '14px 18px',
+                }}
+              >
+                <div style={{ fontSize: 18, fontWeight: 700, color: t.text, fontFamily: 'Syne, sans-serif' }}>
+                  {s.value}
+                </div>
+                <div style={{ fontSize: 11, color: t.textMuted, marginTop: 3 }}>{s.label}</div>
+              </div>
+            ))}
           </div>
+        )}
 
-          {/* Score */}
-          <div>
+        {/* Not in library */}
+        {!libraryItem && (
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px 24px',
+              background: t.bgCard,
+              border: `1px solid ${t.border}`,
+              borderRadius: 14,
+              margin: '28px 0',
+            }}
+          >
+            <p style={{ color: t.textMuted, marginBottom: 16 }}>
+              Ta gra nie jest jeszcze w Twojej bibliotece.
+            </p>
+            <button
+              onClick={() => setShowAddModal(true)}
+              style={{
+                padding: '11px 24px',
+                background: t.accent,
+                border: 'none',
+                borderRadius: 10,
+                color: '#fff',
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: `0 0 30px ${t.accentGlow}`,
+              }}
+            >
+              + Dodaj do biblioteki
+            </button>
+          </div>
+        )}
+
+        {/* Review form */}
+        {libraryItem && (
+          <div
+            style={{
+              background: t.bgCard,
+              border: `1px solid ${t.border}`,
+              borderRadius: 14,
+              padding: 24,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 17, fontWeight: 600, color: t.text }}>
+                Moja recenzja
+              </h3>
+              <button
+                onClick={handleRemove}
+                style={{ fontSize: 12, color: t.textFaint, background: 'none', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#ef4444'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = t.textFaint; }}
+              >
+                ✕ Usuń z biblioteki
+              </button>
+            </div>
+
+            {/* Score display */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+              <div style={{ fontSize: 48, fontWeight: 900, color: scoreColor, fontFamily: 'Syne, sans-serif', minWidth: 80 }}>
+                {form.score || '–'}
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: t.textMuted }}>/100</div>
+                {form.score != null && form.score > 0 && (
+                  <div style={{ fontSize: 11, color: scoreColor, marginTop: 2, fontWeight: 600 }}>
+                    {getScoreLabel(form.score)}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <ScoreSlider
               value={form.score}
-              onChange={val => setForm(f => ({ ...f, score: val }))}
+              onChange={(val) => setForm(f => ({ ...f, score: val === 0 ? undefined : val }))}
+              accentColor={t.accent}
             />
-          </div>
 
-          {/* Review */}
-          <div>
-            <label className="text-sm text-text-primary/60 mb-2 block">Recenzja</label>
+            {/* Status buttons */}
+            <div style={{ marginTop: 20, marginBottom: 16 }}>
+              <label style={{ fontSize: 12, color: t.textMuted, display: 'block', marginBottom: 8 }}>Status</label>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {STATUSES.map(s => {
+                  const active = form.status === s.value;
+                  return (
+                    <button
+                      key={s.value}
+                      onClick={() => setForm(f => ({ ...f, status: s.value }))}
+                      style={{
+                        background: active ? t.accent : t.bgElevated,
+                        color: active ? '#fff' : t.textMuted,
+                        border: `1px solid ${active ? t.accent : t.border}`,
+                        borderRadius: 8,
+                        padding: '7px 14px',
+                        fontSize: 13,
+                        fontWeight: active ? 600 : 400,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        fontFamily: 'Inter, sans-serif',
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Platform */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 12, color: t.textMuted, display: 'block', marginBottom: 8 }}>Platforma</label>
+              <select
+                value={form.platform}
+                onChange={e => setForm(f => ({ ...f, platform: e.target.value }))}
+                style={{
+                  width: '100%',
+                  background: t.inputBg,
+                  border: `1px solid ${t.inputBorder}`,
+                  borderRadius: 8,
+                  padding: '10px 14px',
+                  color: t.text,
+                  fontSize: 13,
+                  outline: 'none',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+              >
+                {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+
+            {/* Review textarea */}
             <textarea
               value={form.review ?? ''}
               onChange={e => setForm(f => ({ ...f, review: e.target.value }))}
-              rows={4}
-              placeholder="Napisz kilka słów o tej grze..."
-              className="w-full bg-bg-primary border border-white/10 rounded-lg px-4 py-3 text-text-primary text-sm focus:outline-none focus:border-accent-purple resize-none placeholder-text-primary/30"
+              placeholder="Napisz swoją recenzję..."
+              style={{
+                width: '100%',
+                minHeight: 110,
+                background: t.inputBg,
+                border: `1px solid ${t.inputBorder}`,
+                borderRadius: 8,
+                padding: 14,
+                color: t.text,
+                fontSize: 13.5,
+                fontFamily: 'Inter, sans-serif',
+                lineHeight: 1.7,
+                resize: 'vertical',
+                outline: 'none',
+              }}
+              onFocus={e => { (e.target as HTMLTextAreaElement).style.borderColor = t.accent; }}
+              onBlur={e => { (e.target as HTMLTextAreaElement).style.borderColor = t.inputBorder; }}
             />
+
+            {/* Save button */}
+            <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                style={{
+                  padding: '10px 24px',
+                  background: t.accent,
+                  border: 'none',
+                  borderRadius: 8,
+                  color: '#fff',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  opacity: saving ? 0.6 : 1,
+                  boxShadow: `0 0 20px ${t.accentGlow}`,
+                  fontFamily: 'Inter, sans-serif',
+                }}
+              >
+                {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
+              </button>
+            </div>
           </div>
+        )}
+      </div>
 
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-accent-purple text-white py-2.5 rounded-lg font-medium hover:bg-accent-purple/80 transition-colors disabled:opacity-50"
-          >
-            {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
-          </button>
-        </div>
-      )}
-
-      {showAddModal && (
+      {showAddModal && game && (
         <AddToLibraryModal
           game={game}
           onClose={() => setShowAddModal(false)}
           onAdded={() => {
             setShowAddModal(false);
-            // Reload library item
             getLibrary().then(lib => {
               const item = lib.find(g => g.igdbId === Number(igdbId)) ?? null;
               setLibraryItem(item);
@@ -210,6 +408,7 @@ export default function GameDetailPage() {
           }}
         />
       )}
-    </main>
+    </div>
   );
 }
+

@@ -1,23 +1,47 @@
 import type { GameStatus } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 
-const STATUS_LABELS: Record<GameStatus, string> = {
-  Planned: 'Planowane',
-  InProgress: 'W trakcie',
-  Completed: 'Ukończone',
-  Abandoned: 'Porzucone',
+const STATUS_META: Record<GameStatus, { label: string; icon: string }> = {
+  Planned:    { label: 'Planowane',  icon: '◷' },
+  InProgress: { label: 'W trakcie', icon: '▶' },
+  Completed:  { label: 'Ukończone', icon: '✓' },
+  Abandoned:  { label: 'Porzucone', icon: '✕' },
 };
 
-const STATUS_CLASSES: Record<GameStatus, string> = {
-  Planned: 'bg-status-planned/20 text-status-planned border border-status-planned/40',
-  InProgress: 'bg-status-inprogress/20 text-status-inprogress border border-status-inprogress/40',
-  Completed: 'bg-status-completed/20 text-status-completed border border-status-completed/40',
-  Abandoned: 'bg-status-abandoned/20 text-status-abandoned border border-status-abandoned/40',
-};
+interface Props {
+  status: GameStatus;
+  small?: boolean;
+}
 
-export default function StatusBadge({ status }: { status: GameStatus }) {
+export default function StatusBadge({ status, small }: Props) {
+  const { t } = useTheme();
+
+  const colorMap: Record<GameStatus, string> = {
+    Planned:    t.statusPlanned,
+    InProgress: t.statusInProgress,
+    Completed:  t.statusCompleted,
+    Abandoned:  t.statusAbandoned,
+  };
+
+  const color = colorMap[status];
+  const meta = STATUS_META[status];
+
   return (
-    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_CLASSES[status]}`}>
-      {STATUS_LABELS[status]}
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        background: `${color}18`,
+        color,
+        border: `1px solid ${color}35`,
+        borderRadius: 20,
+        fontWeight: 600,
+        fontSize: small ? 10 : 11,
+        padding: small ? '2px 7px' : '3px 10px',
+      }}
+    >
+      {meta.icon} {meta.label}
     </span>
   );
 }
