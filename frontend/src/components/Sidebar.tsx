@@ -51,6 +51,19 @@ const NAV_ITEMS = [
     ),
   },
   {
+    id: 'multiplayer',
+    label: 'Multiplayer',
+    path: '/multiplayer',
+    svg: (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+        <circle cx="6" cy="7" r="3" />
+        <circle cx="12" cy="7" r="3" />
+        <path d="M1 16c0-2.8 2.2-5 5-5h2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+        <path d="M17 16c0-2.8-2.2-5-5-5h-2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+      </svg>
+    ),
+  },
+  {
     id: 'profile',
     label: 'Profil',
     path: '/profile',

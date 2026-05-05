@@ -56,6 +56,15 @@ public class IgdbService : IIgdbService
     public Task<List<GameDto>> GetPopularGamesAsync() =>
         PostQueryAsync("fields id,name,cover.image_id,first_release_date,genres.name; where rating_count > 100; sort rating desc; limit 12;");
 
+    public Task<List<GameDto>> GetGamesByGenreAsync(string genre)
+    {
+        var escaped = genre.Replace("\"", "\\\"");
+        return PostQueryAsync(
+            $"fields id,name,cover.image_id,first_release_date,genres.name; " +
+            $"where genres.name = \"{escaped}\" & first_release_date != null & first_release_date <= {DateTimeOffset.UtcNow.ToUnixTimeSeconds()}; " +
+            $"sort first_release_date desc; limit 14;");
+    }
+
     public async Task<GameDto?> GetGameDetailsAsync(int igdbId)
     {
         var cached = await _context.Games.FirstOrDefaultAsync(g => g.IgdbId == igdbId);

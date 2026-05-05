@@ -63,6 +63,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IIgdbService, IgdbService>();
+builder.Services.AddHttpClient<IRiotService, RiotService>();
+builder.Services.AddHttpClient<ISteamService, SteamService>();
 
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]
     ?? throw new InvalidOperationException("JwtSettings:Secret not configured.");

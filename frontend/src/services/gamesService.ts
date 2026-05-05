@@ -9,3 +9,6 @@ export const getPopularGames = () =>
 
 export const getGameById = (igdbId: number) =>
   api.get<GameDto>(`/api/games/${igdbId}`).then(r => r.data);
+
+export const getGamesByGenre = (genre: string) =>
+  api.get<GameDto[]>(`/api/games/by-genre?genre=${encodeURIComponent(genre)}`).then(r => r.data);

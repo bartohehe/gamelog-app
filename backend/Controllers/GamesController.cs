@@ -27,6 +27,14 @@ public class GamesController : ControllerBase
     public async Task<ActionResult<List<GameDto>>> Popular()
         => Ok(await _igdb.GetPopularGamesAsync());
 
+    [HttpGet("by-genre")]
+    public async Task<ActionResult<List<GameDto>>> ByGenre([FromQuery] string genre)
+    {
+        if (string.IsNullOrWhiteSpace(genre))
+            return BadRequest(new { message = "Query parameter 'genre' is required." });
+        return Ok(await _igdb.GetGamesByGenreAsync(genre));
+    }
+
     [HttpGet("{igdbId:int}")]
     public async Task<ActionResult<GameDto>> GetById(int igdbId)
     {

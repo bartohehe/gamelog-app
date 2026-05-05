@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<UserGame> UserGames { get; set; }
+    public DbSet<MultiplayerEntry> MultiplayerEntries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,5 +34,10 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<UserGame>()
             .HasIndex(ug => new { ug.UserId, ug.GameId }).IsUnique();
+
+        modelBuilder.Entity<MultiplayerEntry>()
+            .HasOne(m => m.User)
+            .WithMany()
+            .HasForeignKey(m => m.UserId);
     }
 }

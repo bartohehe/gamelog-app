@@ -24,6 +24,8 @@ services:
       - JwtSettings__Secret=local-docker-secret-key-minimum-32-characters!!
       - ExternalApis__Igdb__ClientId=${IGDB_CLIENT_ID:-}
       - ExternalApis__Igdb__ClientSecret=${IGDB_CLIENT_SECRET:-}
+      - Riot__ApiKey=${RIOT_API_KEY:-}
+      - Steam__ApiKey=${STEAM_API_KEY:-}
     networks:
       - gamelog-network
     depends_on:

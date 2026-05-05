@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getMyStats } from '../services/statsService';
 import { getTopGames } from '../services/statsService';
-import { getPopularGames } from '../services/gamesService';
+import { getPopularGames, getGamesByGenre } from '../services/gamesService';
 import { getLibrary } from '../services/libraryService';
 import type { UserStatsDto, TopGameDto, GameDto, UserGameDto } from '../types';
 import Cover from '../components/Cover';
@@ -66,35 +66,44 @@ function GameRow({
   );
 }
 
-/* ── Trending 2×grid card ── */
+/* ── Trending horizontal card ── */
 function TrendingCard({ game, onClick }: { game: TopGameDto; onClick: () => void }) {
   const { t } = useTheme();
   return (
     <div
       onClick={onClick}
-      style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', transition: 'all 0.15s' }}
+      style={{
+        background: t.bgCard,
+        border: `1px solid ${t.border}`,
+        borderRadius: 12,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'border-color 0.15s, box-shadow 0.15s',
+        display: 'flex',
+        height: 158,
+      }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = t.borderHover;
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+        (e.currentTarget as HTMLDivElement).style.borderColor = t.accent;
+        (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 16px ${t.accentGlow}`;
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLDivElement).style.borderColor = t.border;
-        (e.currentTarget as HTMLDivElement).style.transform = '';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
       }}
     >
-      <div style={{ height: 160, position: 'relative' }}>
-        <Cover title={game.title} coverImageUrl={game.coverImageUrl} />
-        {game.averageScore > 0 && (
-          <div style={{ position: 'absolute', bottom: 8, left: 8 }}>
-            <ScoreBadge score={Math.round(game.averageScore)} size="sm" />
-          </div>
-        )}
-      </div>
-      <div style={{ padding: '10px 13px' }}>
-        <div style={{ fontWeight: 700, color: t.text, fontSize: 13, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      {/* Left: text */}
+      <div style={{ flex: 1, padding: '14px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+        <div style={{ fontWeight: 700, color: t.text, fontSize: 13, fontFamily: 'Syne, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>
           {game.title}
         </div>
-        <div style={{ fontSize: 11, color: t.textMuted }}>{game.reviewCount} ocen</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {game.averageScore > 0 && <ScoreBadge score={Math.round(game.averageScore)} size="sm" />}
+          <span style={{ fontSize: 11, color: t.textMuted }}>{game.reviewCount} ocen</span>
+        </div>
+      </div>
+      {/* Right: cover */}
+      <div style={{ width: 90, flexShrink: 0 }}>
+        <Cover title={game.title} coverImageUrl={game.coverImageUrl} />
       </div>
     </div>
   );
@@ -110,6 +119,8 @@ export default function HomePage() {
   const [popularGames, setPopularGames] = useState<GameDto[]>([]);
   const [library, setLibrary] = useState<UserGameDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recommended, setRecommended] = useState<GameDto[]>([]);
+  const [recommendedGenre, setRecommendedGenre] = useState<string | null>(null);
 
   useEffect(() => {
     const base = [
@@ -119,7 +130,24 @@ export default function HomePage() {
     const authed = isAuthenticated
       ? [
           getMyStats().then(setStats).catch(() => {}),
-          getLibrary().then(setLibrary).catch(() => {}),
+          getLibrary().then(lib => {
+            setLibrary(lib);
+            // Wyznacz top gatunek z ukończonych/w trakcie gier
+            const genres = lib
+              .filter(g => g.status === 'Completed' || g.status === 'InProgress')
+              .flatMap(g => (g as unknown as { genres?: string[] }).genres ?? []);
+            if (genres.length === 0) return;
+            const freq = genres.reduce<Record<string, number>>((acc, g) => {
+              acc[g] = (acc[g] ?? 0) + 1; return acc;
+            }, {});
+            const top = Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0];
+            if (!top) return;
+            setRecommendedGenre(top);
+            const libIds = new Set(lib.map(g => g.igdbId));
+            getGamesByGenre(top)
+              .then(games => setRecommended(games.filter(g => !libIds.has(g.igdbId))))
+              .catch(() => {});
+          }).catch(() => {}),
         ]
       : [];
     Promise.all([...base, ...authed]).finally(() => setLoading(false));
@@ -185,53 +213,47 @@ export default function HomePage() {
   const inProgress = library.filter(g => g.status === 'InProgress');
   const trendingGrid = topGames.slice(0, 4);
   const discoverRow = popularGames.slice(0, 8);
+  const recommendedSub = recommendedGenre
+    ? `Najnowsze premiery z gatunku ${recommendedGenre}`
+    : 'Najnowsze gry dopasowane do Twoich upodobań';
 
-  const kpis = stats
-    ? [
-        { label: 'Łącznie gier',   value: stats.totalGames },
-        { label: 'W trakcie',      value: stats.inProgressCount },
-        { label: 'Ukończone',      value: stats.completedCount },
-        { label: 'Planowane',      value: stats.plannedCount },
-        { label: 'Porzucone',      value: stats.abandonedCount },
-        ...(stats.averageScore != null ? [{ label: 'Śr. ocena', value: stats.averageScore.toFixed(1) }] : []),
-      ]
-    : [];
 
   return (
     <div style={{ flex: 1, overflow: 'auto', background: t.bg }}>
 
       {/* ── Full-bleed hero ── */}
       {hero && (
-        <div style={{ position: 'relative', height: 400 }}>
-          {/* Background — rozmyte cover */}
+        <div style={{ position: 'relative', height: 320, overflow: 'hidden' }}>
+          {/* Blurred cover background */}
           {hero.coverImageUrl ? (
             <img
               src={hero.coverImageUrl}
               alt=""
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(20px) brightness(0.4)', transform: 'scale(1.1)' }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(28px) brightness(0.55)', transform: 'scale(1.15)' }}
             />
           ) : (
             <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${t.bgElevated}, ${t.accent}50)` }} />
           )}
-          {/* Gradient overlay */}
-          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 30%, ${t.bg} 100%)` }} />
-          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${t.bg}90 0%, transparent 60%)` }} />
+          {/* Gradient — mocne przyciemnienie tylko na dole */}
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 60%, ${t.bg} 100%)` }} />
+          {/* Lewa strona — łagodne przyciemnienie dla czytelności */}
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, rgba(0,0,0,0.45) 0%, transparent 55%)` }} />
 
           {/* Content */}
-          <div style={{ position: 'absolute', inset: 0, padding: '60px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', maxWidth: 700 }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>✦ Popularne teraz</div>
-            <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 46, fontWeight: 900, color: '#fff', lineHeight: 1, marginBottom: 12 }}>{hero.title}</h1>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 0 }}>
+          <div style={{ position: 'absolute', inset: 0, padding: '40px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', maxWidth: 680 }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 10, fontWeight: 600 }}>✦ Popularne teraz</div>
+            <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 42, fontWeight: 900, color: '#fff', lineHeight: 1.05, marginBottom: 16 }}>{hero.title}</h1>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               {hero.averageScore > 0 && <ScoreBadge score={Math.round(hero.averageScore)} size="lg" />}
               <button
                 onClick={() => navigate(`/game/${hero.igdbId}`)}
-                style={{ padding: '11px 24px', background: t.accent, border: 'none', borderRadius: 10, color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: `0 0 30px ${t.accentGlow}` }}
+                style={{ padding: '10px 22px', background: t.accent, border: 'none', borderRadius: 9, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: `0 0 24px ${t.accentGlow}` }}
               >
                 Szczegóły
               </button>
               <button
                 onClick={() => navigate('/search')}
-                style={{ padding: '11px 18px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, color: '#fff', fontSize: 14, cursor: 'pointer', fontFamily: 'Inter, sans-serif', backdropFilter: 'blur(8px)' }}
+                style={{ padding: '10px 16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 9, color: '#fff', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif', backdropFilter: 'blur(6px)' }}
               >
                 + Dodaj do biblioteki
               </button>
@@ -241,7 +263,7 @@ export default function HomePage() {
       )}
 
       {/* ── Content pod hero ── */}
-      <div style={{ padding: '0 40px 40px' }}>
+      <div style={{ padding: '24px 40px 40px' }}>
 
         {/* 2-column layout */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 32 }}>
@@ -252,7 +274,7 @@ export default function HomePage() {
             {trendingGrid.length > 0 && (
               <>
                 <SectionHeader title="Popularne teraz" sub="Najwyżej oceniane przez społeczność" />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 40 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 40 }}>
                   {trendingGrid.map(game => (
                     <TrendingCard key={game.igdbId} game={game} onClick={() => navigate(`/game/${game.igdbId}`)} />
                   ))}
@@ -314,18 +336,16 @@ export default function HomePage() {
                 ].map(row => (
                   <div
                     key={row.label}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}
+                    style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: row.color }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 90 }}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: row.color, flexShrink: 0 }} />
                       <span style={{ fontSize: 12, color: t.textMuted }}>{row.label}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, margin: '0 12px' }}>
-                      <div style={{ flex: 1, height: 3, background: t.bgElevated, borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${stats.totalGames > 0 ? (row.value / stats.totalGames) * 100 : 0}%`, background: row.color, borderRadius: 2 }} />
-                      </div>
+                    <div style={{ flex: 1, height: 3, background: t.bgElevated, borderRadius: 2, overflow: 'hidden', margin: '0 12px' }}>
+                      <div style={{ height: '100%', width: `${stats.totalGames > 0 ? (row.value / stats.totalGames) * 100 : 0}%`, background: row.color, borderRadius: 2 }} />
                     </div>
-                    <span style={{ fontSize: 12, color: t.textFaint, minWidth: 20, textAlign: 'right' }}>{row.value}</span>
+                    <span style={{ fontSize: 12, color: t.textFaint, minWidth: 16, textAlign: 'right' }}>{row.value}</span>
                   </div>
                 ))}
                 {stats.averageScore != null && (
@@ -338,6 +358,18 @@ export default function HomePage() {
             )}
           </div>
         </div>
+
+        {/* ── Polecane dla ciebie ── pełna szerokość pod gridem */}
+        {recommended.length > 0 && (
+          <div style={{ marginTop: 40 }}>
+            <SectionHeader
+              title="Polecane dla Ciebie"
+              sub={recommendedSub}
+              onMore={() => navigate('/search')}
+            />
+            <GameRow games={recommended} onClickGame={g => navigate(`/game/${g.igdbId}`)} cardHeight={200} />
+          </div>
+        )}
       </div>
     </div>
   );

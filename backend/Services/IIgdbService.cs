@@ -8,5 +8,6 @@ public interface IIgdbService
     Task<List<GameDto>> SearchGamesAsync(string query);
     Task<GameDto?> GetGameDetailsAsync(int igdbId);
     Task<List<GameDto>> GetPopularGamesAsync();
+    Task<List<GameDto>> GetGamesByGenreAsync(string genre);
     Task<Game> GetOrCreateCachedGameAsync(int igdbId);
 }
