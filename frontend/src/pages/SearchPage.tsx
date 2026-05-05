@@ -50,7 +50,7 @@ export default function SearchPage() {
 
   return (
     <div style={{ flex: 1, overflow: 'auto', padding: '32px 36px' }}>
-      <div style={{ maxWidth: 720 }}>
+      <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 26, fontWeight: 700, color: t.text, marginBottom: 24 }}>
           Wyszukaj gry
         </h1>

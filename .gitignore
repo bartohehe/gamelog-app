@@ -2,6 +2,7 @@
 bin/
 obj/
 .claude/
+docs/TODO
 
 # Lokalne ustawienia z kluczami — nie commitować
 backend/appsettings.Local.json

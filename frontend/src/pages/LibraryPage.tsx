@@ -164,7 +164,7 @@ export default function LibraryPage() {
 
   return (
     <div style={{ flex: 1, overflow: 'auto', padding: '32px 36px' }}>
-      <div style={{ maxWidth: 1100 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         {/* Header */}
         <div
           style={{

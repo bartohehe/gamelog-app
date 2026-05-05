@@ -32,7 +32,7 @@ export default function ProfilePage() {
 
   return (
     <div style={{ flex: 1, overflow: 'auto', padding: '32px 36px' }}>
-      <div style={{ maxWidth: 800 }}>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Profile card */}
         <div
           style={{

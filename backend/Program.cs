@@ -9,7 +9,15 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+// Załaduj przed zmiennymi środowiskowymi — env vars mają wyższy priorytet (Docker)
+builder.Configuration.Sources.Insert(
+    2,
+    new Microsoft.Extensions.Configuration.Json.JsonConfigurationSource
+    {
+        Path = "appsettings.Local.json",
+        Optional = true,
+        ReloadOnChange = true,
+    });
 
 if (builder.Environment.IsProduction())
 {
