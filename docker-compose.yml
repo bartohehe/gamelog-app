@@ -21,6 +21,7 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=gamelog-db;Database=GameLog;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True
+      - ConnectionStrings__Redis=redis:6379
       - JwtSettings__Secret=local-docker-secret-key-minimum-32-characters!!
       - ExternalApis__Igdb__ClientId=${IGDB_CLIENT_ID:-}
       - ExternalApis__Igdb__ClientSecret=${IGDB_CLIENT_SECRET:-}
@@ -30,6 +31,7 @@ services:
       - gamelog-network
     depends_on:
       - gamelog-db
+      - redis
 
   gamelog-db:
     image: mcr.microsoft.com/azure-sql-edge
@@ -42,6 +44,15 @@ services:
       - "1433:1433"
     volumes:
       - sql-data:/var/opt/mssql
+    networks:
+      - gamelog-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: gamelog-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
     networks:
       - gamelog-network
 
