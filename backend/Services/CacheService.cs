@@ -33,15 +33,18 @@ public class CacheService : ICacheService
 
         var value = await factory();
 
-        try
+        if (value != null)
         {
-            var opts = new DistributedCacheEntryOptions();
-            if (ttl.HasValue) opts.AbsoluteExpirationRelativeToNow = ttl;
-            await _cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(value, JsonOpts), opts);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Redis SET failed for key {Key} — result not cached", key);
+            try
+            {
+                var opts = new DistributedCacheEntryOptions();
+                if (ttl.HasValue) opts.AbsoluteExpirationRelativeToNow = ttl;
+                await _cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(value, JsonOpts), opts);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis SET failed for key {Key} — result not cached", key);
+            }
         }
 
         return value;
@@ -72,7 +75,12 @@ public class CacheService : ICacheService
 
     public async Task<bool> ExistsAsync(string key)
     {
-        try { return await _cache.GetAsync(key) != null; }
+        try
+        {
+            // IDistributedCache has no native key-exists primitive; fetching bytes is the only option.
+            // For small sentinel values (e.g. cooldown flags) the overhead is negligible.
+            return await _cache.GetAsync(key) != null;
+        }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Redis EXISTS failed for key {Key}", key);
