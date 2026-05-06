@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useTheme } from './contexts/ThemeContext';
+import { FeatureFlagsProvider, useFeatureFlags } from './contexts/FeatureFlagsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import { lazy, Suspense } from 'react';
@@ -37,9 +38,13 @@ function LoadingSpinner() {
 function AppShell() {
   const location = useLocation();
   const { t } = useTheme();
+  const { authEnabled, multiplayerEnabled } = useFeatureFlags();
+
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
+  // When auth is disabled, redirect login/register to home
   if (isAuthPage) {
+    if (!authEnabled) return <Navigate to="/" replace />;
     return (
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
@@ -50,6 +55,10 @@ function AppShell() {
     );
   }
 
+  // When auth is disabled, bypass ProtectedRoute
+  const Guard = ({ children }: { children: React.ReactNode }) =>
+    authEnabled ? <ProtectedRoute>{children}</ProtectedRoute> : <>{children}</>;
+
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', overflow: 'hidden', background: t.bg }}>
       <Sidebar />
@@ -57,11 +66,13 @@ function AppShell() {
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
-            <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
-            <Route path="/game/:igdbId" element={<ProtectedRoute><GameDetailPage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/multiplayer" element={<ProtectedRoute><MultiplayerPage /></ProtectedRoute>} />
+            <Route path="/search" element={<Guard><SearchPage /></Guard>} />
+            <Route path="/library" element={<Guard><LibraryPage /></Guard>} />
+            <Route path="/game/:igdbId" element={<Guard><GameDetailPage /></Guard>} />
+            <Route path="/profile" element={<Guard><ProfilePage /></Guard>} />
+            {multiplayerEnabled && (
+              <Route path="/multiplayer" element={<Guard><MultiplayerPage /></Guard>} />
+            )}
           </Routes>
         </Suspense>
       </div>
@@ -71,12 +82,14 @@ function AppShell() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <BrowserRouter>
-          <AppShell />
-        </BrowserRouter>
-      </ThemeProvider>
-    </AuthProvider>
+    <FeatureFlagsProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <BrowserRouter>
+            <AppShell />
+          </BrowserRouter>
+        </ThemeProvider>
+      </AuthProvider>
+    </FeatureFlagsProvider>
   );
 }

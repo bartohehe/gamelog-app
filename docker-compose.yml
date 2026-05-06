@@ -27,6 +27,8 @@ services:
       - ExternalApis__Igdb__ClientSecret=${IGDB_CLIENT_SECRET:-}
       - Riot__ApiKey=${RIOT_API_KEY:-}
       - Steam__ApiKey=${STEAM_API_KEY:-}
+      - FeatureFlags__AuthEnabled=${AUTH_ENABLED:-true}
+      - FeatureFlags__MultiplayerEnabled=${MULTIPLAYER_ENABLED:-true}
       - FeatureFlags__SocialFeaturesEnabled=${SOCIAL_FEATURES_ENABLED:-false}
       - FeatureFlags__ReviewsEnabled=${REVIEWS_ENABLED:-true}
       - FeatureFlags__BacklogEnabled=${BACKLOG_ENABLED:-true}

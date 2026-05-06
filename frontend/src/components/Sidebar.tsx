@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme, THEMES } from '../contexts/ThemeContext';
 import type { ThemeName } from '../contexts/ThemeContext';
+import { useFeatureFlags } from '../contexts/FeatureFlagsContext';
 
 const THEME_DOTS: Record<ThemeName, string> = {
   neon: '#7c3aed',
@@ -87,10 +88,14 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const { t, theme, setTheme } = useTheme();
+  const { multiplayerEnabled } = useFeatureFlags();
   const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
+  const visibleNavItems = NAV_ITEMS.filter(
+    item => item.id !== 'multiplayer' || multiplayerEnabled
+  );
   const initials = user?.username ? user.username[0].toUpperCase() : '?';
 
   return (
@@ -162,7 +167,7 @@ export default function Sidebar() {
 
       {/* ── Nav ── */}
       <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '12px 0' }}>
-        {NAV_ITEMS.map(item => {
+        {visibleNavItems.map(item => {
           const active = isActive(item.path);
           return (
             <button
