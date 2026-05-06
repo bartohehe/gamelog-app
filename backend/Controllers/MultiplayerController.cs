@@ -17,24 +17,17 @@ public class MultiplayerController : ControllerBase
     private readonly AppDbContext _db;
     private readonly IRiotService _riot;
     private readonly ISteamService _steam;
+    private readonly ICacheService _cache;
 
-    public MultiplayerController(AppDbContext db, IRiotService riot, ISteamService steam)
+    public MultiplayerController(AppDbContext db, IRiotService riot, ISteamService steam, ICacheService cache)
     {
         _db = db;
         _riot = riot;
         _steam = steam;
+        _cache = cache;
     }
 
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-    [HttpGet("config-check")]
-    public ActionResult ConfigCheck([FromServices] IConfiguration cfg) => Ok(new
-    {
-        riotKeyLength  = (cfg["Riot:ApiKey"]  ?? "").Length,
-        riotKeyPrefix  = (cfg["Riot:ApiKey"]  ?? "").Length > 5 ? cfg["Riot:ApiKey"]![..5] : "EMPTY",
-        steamKeyLength = (cfg["Steam:ApiKey"] ?? "").Length,
-        steamKeyPrefix = (cfg["Steam:ApiKey"] ?? "").Length > 5 ? cfg["Steam:ApiKey"]![..5] : "EMPTY",
-    });
 
     private static MultiplayerEntryDto Map(MultiplayerEntry e) => new()
     {
@@ -50,6 +43,7 @@ public class MultiplayerController : ControllerBase
         HoursPlayed = e.HoursPlayed,
         Platform = e.Platform,
         InGameUsername = e.InGameUsername,
+        SyncIdentifier = e.SyncIdentifier,
         UpdatedAt = e.UpdatedAt,
     };
 
@@ -80,6 +74,7 @@ public class MultiplayerController : ControllerBase
             HoursPlayed = dto.HoursPlayed,
             Platform = dto.Platform,
             InGameUsername = dto.InGameUsername,
+            SyncIdentifier = dto.SyncIdentifier,
             UpdatedAt = DateTime.UtcNow,
         };
         _db.MultiplayerEntries.Add(entry);
@@ -104,6 +99,7 @@ public class MultiplayerController : ControllerBase
         entry.HoursPlayed = dto.HoursPlayed;
         entry.Platform = dto.Platform;
         entry.InGameUsername = dto.InGameUsername;
+        entry.SyncIdentifier = dto.SyncIdentifier;
         entry.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -127,7 +123,7 @@ public class MultiplayerController : ControllerBase
 
     /// <summary>
     /// Fetches LoL rank from Riot API and returns pre-filled DTO (does NOT save).
-    /// Frontend can then confirm + save via POST /api/multiplayer.
+    /// SyncIdentifier is set to the Riot platform so refresh-all can re-use it.
     /// </summary>
     [HttpPost("sync/lol")]
     public async Task<ActionResult<UpsertMultiplayerEntryDto>> SyncLol([FromBody] SyncLolDto dto)
@@ -137,6 +133,7 @@ public class MultiplayerController : ControllerBase
         try
         {
             var result = await _riot.GetLoLRankAsync(dto.SummonerName.Trim(), dto.Platform);
+            result.SyncIdentifier = dto.Platform;
             return Ok(result);
         }
         catch (Exception ex)
@@ -151,11 +148,84 @@ public class MultiplayerController : ControllerBase
         try
         {
             var result = await _steam.GetCs2StatsAsync(dto.SteamId);
+            result.SyncIdentifier = dto.SteamId;
             return Ok(result);
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    // ── Refresh-all endpoint ─────────────────────────────────────
+
+    public record RefreshAllResult(List<MultiplayerEntryDto> Entries, List<string> Errors);
+
+    /// <summary>
+    /// Re-fetches rank/stats from Riot/Steam for every entry that has a SyncIdentifier.
+    /// Rate-limited to once per 5 minutes via Redis cooldown key.
+    /// </summary>
+    [HttpPost("refresh-all")]
+    public async Task<ActionResult<RefreshAllResult>> RefreshAll()
+    {
+        var cooldownKey = $"multiplayer:refresh-cooldown:{UserId}";
+
+        if (await _cache.ExistsAsync(cooldownKey))
+            return StatusCode(429, new { message = "Odświeżanie jest możliwe raz na 5 minut. Spróbuj ponownie za chwilę." });
+
+        var entries = await _db.MultiplayerEntries
+            .Where(e => e.UserId == UserId)
+            .ToListAsync();
+
+        var errors = new List<string>();
+
+        foreach (var entry in entries)
+        {
+            if (string.IsNullOrEmpty(entry.InGameUsername) || string.IsNullOrEmpty(entry.SyncIdentifier))
+                continue;
+
+            try
+            {
+                UpsertMultiplayerEntryDto fresh;
+
+                if (entry.GameTitle == "League of Legends")
+                {
+                    fresh = await _riot.GetLoLRankAsync(entry.InGameUsername, entry.SyncIdentifier);
+                }
+                else if (entry.GameTitle == "Counter-Strike 2")
+                {
+                    fresh = await _steam.GetCs2StatsAsync(entry.SyncIdentifier);
+                }
+                else
+                {
+                    continue;
+                }
+
+                entry.Tier = fresh.Tier;
+                entry.Rank = fresh.Rank;
+                entry.RankPoints = fresh.RankPoints;
+                entry.RankPointsMax = fresh.RankPointsMax;
+                entry.WinRate = fresh.WinRate;
+                entry.KdRatio = fresh.KdRatio;
+                entry.HoursPlayed = fresh.HoursPlayed;
+                entry.UpdatedAt = DateTime.UtcNow;
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"{entry.GameTitle}: {ex.Message}");
+            }
+        }
+
+        await _db.SaveChangesAsync();
+
+        // Set cooldown AFTER saving so a failed run doesn't block the user
+        await _cache.SetAsync(cooldownKey, true, TimeSpan.FromMinutes(5));
+
+        var updated = await _db.MultiplayerEntries
+            .Where(e => e.UserId == UserId)
+            .OrderBy(e => e.GameTitle)
+            .ToListAsync();
+
+        return Ok(new RefreshAllResult(updated.Select(Map).ToList(), errors));
     }
 }
