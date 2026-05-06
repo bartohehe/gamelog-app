@@ -58,8 +58,8 @@ var connectionString = builder.Configuration["DbConnectionString"]
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString,
-        sql => sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)));
+    options.UseNpgsql(connectionString,
+        npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorCodesToAdd: null)));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IIgdbService, IgdbService>();
