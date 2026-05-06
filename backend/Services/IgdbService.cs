@@ -14,15 +14,17 @@ public class IgdbService : IIgdbService
     private readonly string _clientId;
     private readonly string _clientSecret;
     private readonly AppDbContext _context;
+    private readonly ICacheService _cache;
     private static string? _accessToken;
     private static DateTime _tokenExpiry = DateTime.MinValue;
 
-    public IgdbService(HttpClient http, IConfiguration config, AppDbContext context)
+    public IgdbService(HttpClient http, IConfiguration config, AppDbContext context, ICacheService cache)
     {
         _http = http;
         _clientId = config["ExternalApis:Igdb:ClientId"] ?? "";
         _clientSecret = config["ExternalApis:Igdb:ClientSecret"] ?? "";
         _context = context;
+        _cache = cache;
     }
 
     private async Task EnsureTokenAsync()
@@ -50,28 +52,44 @@ public class IgdbService : IIgdbService
         return games.Select(MapGame).ToList();
     }
 
-    public Task<List<GameDto>> SearchGamesAsync(string query) =>
-        PostQueryAsync($"search \"{query}\"; fields id,name,cover.image_id,first_release_date,genres.name; limit 12;");
+    public Task<List<GameDto>?> SearchGamesAsync(string query) =>
+        _cache.GetOrSetAsync(
+            $"igdb:search:{query.ToLowerInvariant()}",
+            () => PostQueryAsync($"search \"{query}\"; fields id,name,cover.image_id,first_release_date,genres.name; limit 12;"),
+            TimeSpan.FromMinutes(15));
 
-    public Task<List<GameDto>> GetPopularGamesAsync() =>
-        PostQueryAsync("fields id,name,cover.image_id,first_release_date,genres.name; where rating_count > 100; sort rating desc; limit 12;");
+    public Task<List<GameDto>?> GetPopularGamesAsync() =>
+        _cache.GetOrSetAsync(
+            "igdb:popular",
+            () => PostQueryAsync("fields id,name,cover.image_id,first_release_date,genres.name; where rating_count > 100; sort rating desc; limit 12;"),
+            TimeSpan.FromHours(6));
 
-    public Task<List<GameDto>> GetGamesByGenreAsync(string genre)
+    public Task<List<GameDto>?> GetGamesByGenreAsync(string genre)
     {
         var escaped = genre.Replace("\"", "\\\"");
-        return PostQueryAsync(
-            $"fields id,name,cover.image_id,first_release_date,genres.name; " +
-            $"where genres.name = \"{escaped}\" & first_release_date != null & first_release_date <= {DateTimeOffset.UtcNow.ToUnixTimeSeconds()}; " +
-            $"sort first_release_date desc; limit 14;");
+        return _cache.GetOrSetAsync(
+            $"igdb:genre:{genre.ToLowerInvariant()}",
+            () => PostQueryAsync(
+                $"fields id,name,cover.image_id,first_release_date,genres.name; " +
+                $"where genres.name = \"{escaped}\" & first_release_date != null & first_release_date <= {DateTimeOffset.UtcNow.ToUnixTimeSeconds()}; " +
+                $"sort first_release_date desc; limit 14;"),
+            TimeSpan.FromHours(2));
     }
 
     public async Task<GameDto?> GetGameDetailsAsync(int igdbId)
     {
+        // DB cache takes priority (permanent storage); Redis adds in-memory speed for repeated detail lookups
         var cached = await _context.Games.FirstOrDefaultAsync(g => g.IgdbId == igdbId);
         if (cached != null) return MapCachedGame(cached);
 
-        var results = await PostQueryAsync($"where id = {igdbId}; fields id,name,cover.image_id,first_release_date,genres.name;");
-        return results.FirstOrDefault();
+        return await _cache.GetOrSetAsync(
+            $"igdb:game:{igdbId}",
+            async () =>
+            {
+                var results = await PostQueryAsync($"where id = {igdbId}; fields id,name,cover.image_id,first_release_date,genres.name;");
+                return results.FirstOrDefault()!;
+            },
+            TimeSpan.FromHours(24));
     }
 
     public async Task<Game> GetOrCreateCachedGameAsync(int igdbId)

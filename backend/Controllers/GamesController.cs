@@ -20,19 +20,19 @@ public class GamesController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(q))
             return BadRequest(new { message = "Query parameter 'q' is required." });
-        return Ok(await _igdb.SearchGamesAsync(q));
+        return Ok(await _igdb.SearchGamesAsync(q) ?? new());
     }
 
     [HttpGet("popular")]
     public async Task<ActionResult<List<GameDto>>> Popular()
-        => Ok(await _igdb.GetPopularGamesAsync());
+        => Ok(await _igdb.GetPopularGamesAsync() ?? new());
 
     [HttpGet("by-genre")]
     public async Task<ActionResult<List<GameDto>>> ByGenre([FromQuery] string genre)
     {
         if (string.IsNullOrWhiteSpace(genre))
             return BadRequest(new { message = "Query parameter 'genre' is required." });
-        return Ok(await _igdb.GetGamesByGenreAsync(genre));
+        return Ok(await _igdb.GetGamesByGenreAsync(genre) ?? new());
     }
 
     [HttpGet("{igdbId:int}")]
