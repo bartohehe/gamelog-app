@@ -13,6 +13,7 @@ export interface MultiplayerEntryDto {
   hoursPlayed?: number;
   platform?: string;
   inGameUsername?: string;
+  syncIdentifier?: string;
   updatedAt: string;
 }
 
@@ -28,6 +29,12 @@ export interface UpsertMultiplayerEntryDto {
   hoursPlayed?: number;
   platform?: string;
   inGameUsername?: string;
+  syncIdentifier?: string;
+}
+
+export interface RefreshAllResult {
+  entries: MultiplayerEntryDto[];
+  errors: string[];
 }
 
 export const getMultiplayerEntries = () =>
@@ -47,3 +54,6 @@ export const syncLolRank = (summonerName: string, platform = 'eun1') =>
 
 export const syncCs2Stats = (steamId: string) =>
   api.post<UpsertMultiplayerEntryDto>('/api/multiplayer/sync/cs2', { steamId }).then(r => r.data);
+
+export const refreshAllMultiplayer = () =>
+  api.post<RefreshAllResult>('/api/multiplayer/refresh-all').then(r => r.data);

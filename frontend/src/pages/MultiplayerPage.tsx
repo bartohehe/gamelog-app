@@ -7,6 +7,7 @@ import {
   deleteMultiplayerEntry,
   syncLolRank,
   syncCs2Stats,
+  refreshAllMultiplayer,
   type MultiplayerEntryDto,
   type UpsertMultiplayerEntryDto,
 } from '../services/multiplayerService';
@@ -376,6 +377,8 @@ export default function MultiplayerPage() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<MultiplayerEntryDto | null>(null);
   const [modal, setModal] = useState<'add' | 'edit' | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
 
   useEffect(() => {
     getMultiplayerEntries()
@@ -402,6 +405,23 @@ export default function MultiplayerPage() {
     setEntries(es => es.filter(e => e.id !== selected.id));
     setSelected(null);
   }
+
+  const handleRefreshAll = async () => {
+    setRefreshing(true);
+    setRefreshError(null);
+    try {
+      const result = await refreshAllMultiplayer();
+      setEntries(result.entries);
+      if (result.errors.length > 0) {
+        setRefreshError(`Częściowe odświeżenie. Błędy: ${result.errors.join('; ')}`);
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message ?? 'Nie udało się odświeżyć danych.';
+      setRefreshError(msg);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -434,13 +454,27 @@ export default function MultiplayerPage() {
               <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 26, fontWeight: 700, color: t.text, margin: 0 }}>Multiplayer</h1>
               <div style={{ fontSize: 13, color: t.textMuted, marginTop: 4 }}>{entries.length} {entries.length === 1 ? 'gra' : 'gier'} w trackingu</div>
             </div>
-            <button
-              onClick={() => setModal('add')}
-              style={{ padding: '9px 18px', background: t.accent, border: 'none', borderRadius: 9, color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif', boxShadow: `0 0 20px ${t.accentGlow}` }}
-            >
-              + Dodaj grę
-            </button>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button
+                onClick={handleRefreshAll}
+                disabled={refreshing}
+                style={{ padding: '9px 18px', background: t.bgElevated, border: `1px solid ${t.border}`, borderRadius: 9, color: t.textMuted, cursor: refreshing ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif', opacity: refreshing ? 0.6 : 1 }}
+              >
+                {refreshing ? '↻ Odświeżanie…' : '↻ Odśwież wszystkie'}
+              </button>
+              <button
+                onClick={() => setModal('add')}
+                style={{ padding: '9px 18px', background: t.accent, border: 'none', borderRadius: 9, color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif', boxShadow: `0 0 20px ${t.accentGlow}` }}
+              >
+                + Dodaj grę
+              </button>
+            </div>
           </div>
+          {refreshError && (
+            <div style={{ marginBottom: 16, padding: '10px 14px', background: '#ff6b6b18', border: '1px solid #ff6b6b40', borderRadius: 8, fontSize: 13, color: '#ff6b6b' }}>
+              {refreshError}
+            </div>
+          )}
 
           {/* Empty state */}
           {entries.length === 0 && (
