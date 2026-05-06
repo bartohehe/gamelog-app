@@ -7,15 +7,20 @@ public class MultiplayerEntry
     public User User { get; set; } = null!;
 
     public string GameTitle { get; set; } = "";
-    public string? Mode { get; set; }          // "5v5 Tactical", "Battle Royale" etc.
-    public string? Tier { get; set; }          // "diamond", "gold", "platinum" etc.
-    public string? Rank { get; set; }          // "Diamond 2", "Gold IV" etc.
-    public int? RankPoints { get; set; }       // current LP/RP/MMR
-    public int? RankPointsMax { get; set; }    // max points for progress bar (e.g. 100)
-    public double? WinRate { get; set; }       // 0-100
+    public string? Mode { get; set; }
+    public string? Tier { get; set; }
+    public string? Rank { get; set; }
+    public int? RankPoints { get; set; }
+    public int? RankPointsMax { get; set; }
+    public double? WinRate { get; set; }
     public double? KdRatio { get; set; }
     public int? HoursPlayed { get; set; }
-    public string? Platform { get; set; }      // "PC", "PS5", "Xbox"
+    public string? Platform { get; set; }
     public string? InGameUsername { get; set; }
+    /// <summary>
+    /// Stores the external identifier needed for re-sync:
+    /// LoL → Riot platform (e.g. "eun1"), CS2 → Steam 64-bit ID.
+    /// </summary>
+    public string? SyncIdentifier { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

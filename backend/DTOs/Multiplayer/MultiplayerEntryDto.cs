@@ -14,6 +14,7 @@ public class MultiplayerEntryDto
     public int? HoursPlayed { get; set; }
     public string? Platform { get; set; }
     public string? InGameUsername { get; set; }
+    public string? SyncIdentifier { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 
@@ -30,4 +31,5 @@ public class UpsertMultiplayerEntryDto
     public int? HoursPlayed { get; set; }
     public string? Platform { get; set; }
     public string? InGameUsername { get; set; }
+    public string? SyncIdentifier { get; set; }
 }
