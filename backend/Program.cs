@@ -83,6 +83,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+    options.Configuration = builder.Configuration.GetConnectionString("Redis"));
+
+builder.Services.AddSingleton<ICacheService, CacheService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
