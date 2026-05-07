@@ -88,7 +88,7 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const { t, theme, setTheme } = useTheme();
-  const { multiplayerEnabled } = useFeatureFlags();
+  const { multiplayerEnabled, authEnabled } = useFeatureFlags();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -96,7 +96,10 @@ export default function Sidebar() {
   const visibleNavItems = NAV_ITEMS.filter(
     item => item.id !== 'multiplayer' || multiplayerEnabled
   );
-  const initials = user?.username ? user.username[0].toUpperCase() : '?';
+  // When auth is disabled treat the session as always logged-in
+  const effectivelyAuthenticated = !authEnabled || isAuthenticated;
+  const displayName = user?.username ?? (!authEnabled ? 'Admin' : 'Gość');
+  const initials = displayName[0].toUpperCase();
 
   return (
     <div
@@ -225,8 +228,8 @@ export default function Sidebar() {
           );
         })}
 
-        {/* Status counts — only when authenticated + expanded */}
-        {expanded && isAuthenticated && (
+        {/* Status counts — only when effectively authenticated + expanded */}
+        {expanded && effectivelyAuthenticated && (
           <div style={{ marginTop: 20, padding: '0 14px' }}>
             <div
               style={{
@@ -356,7 +359,7 @@ export default function Sidebar() {
 
       {/* ── User ── */}
       <div
-        onClick={() => navigate(isAuthenticated ? '/profile' : '/login')}
+        onClick={() => navigate(effectivelyAuthenticated ? '/profile' : '/login')}
         style={{
           padding: expanded ? '12px 14px' : '12px 0',
           borderTop: `1px solid ${t.border}`,
@@ -398,11 +401,11 @@ export default function Sidebar() {
                 textOverflow: 'ellipsis',
               }}
             >
-              {user?.username ?? 'Gość'}
+              {displayName}
             </div>
-            {user && (
+            {(user || !authEnabled) && (
               <div style={{ fontSize: 11, color: t.textFaint }}>
-                @{user.username.toLowerCase()}
+                @{displayName.toLowerCase()}
               </div>
             )}
           </div>

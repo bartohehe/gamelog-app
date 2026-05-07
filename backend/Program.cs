@@ -99,10 +99,41 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+var authEnabled = app.Configuration.GetValue<bool>("FeatureFlags:AuthEnabled", true);
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+
+    // When auth is disabled, ensure a default user exists so library operations have a userId to work with
+    if (!authEnabled && !db.Users.Any())
+    {
+        db.Users.Add(new CloudBackend.Models.User
+        {
+            Username = "admin",
+            Email = "admin@localhost",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
+            CreatedAt = DateTime.UtcNow,
+        });
+        db.SaveChanges();
+    }
+}
+
+// When auth is disabled, inject the first user's identity into every request
+// so [Authorize] passes and GetUserId() returns a valid user ID
+if (!authEnabled)
+{
+    app.Use(async (context, next) =>
+    {
+        using var scope = context.RequestServices.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var userId = db.Users.Select(u => u.Id).FirstOrDefault();
+        var claims = new[] { new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, userId.ToString()) };
+        context.User = new System.Security.Claims.ClaimsPrincipal(
+            new System.Security.Claims.ClaimsIdentity(claims, "AuthDisabled"));
+        await next();
+    });
 }
 
 app.UseSwagger();
