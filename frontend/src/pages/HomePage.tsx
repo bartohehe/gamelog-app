@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useFeatureFlags } from '../contexts/FeatureFlagsContext';
 import { getMyStats } from '../services/statsService';
 import { getTopGames } from '../services/statsService';
 import { getPopularGames, getGamesByGenre } from '../services/gamesService';
@@ -111,6 +112,8 @@ function TrendingCard({ game, onClick }: { game: TopGameDto; onClick: () => void
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
+  const { authEnabled } = useFeatureFlags();
+  const effectivelyAuthenticated = !authEnabled || isAuthenticated;
   const { t } = useTheme();
   const navigate = useNavigate();
 
@@ -127,7 +130,7 @@ export default function HomePage() {
       getTopGames().then(setTopGames).catch(() => {}),
       getPopularGames().then(setPopularGames).catch(() => {}),
     ];
-    const authed = isAuthenticated
+    const authed = effectivelyAuthenticated
       ? [
           getMyStats().then(setStats).catch(() => {}),
           getLibrary().then(lib => {
@@ -151,7 +154,7 @@ export default function HomePage() {
         ]
       : [];
     Promise.all([...base, ...authed]).finally(() => setLoading(false));
-  }, [isAuthenticated]);
+  }, [effectivelyAuthenticated]);
 
   const spinner = (
     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: t.bg }}>
@@ -163,7 +166,7 @@ export default function HomePage() {
   if (loading) return spinner;
 
   /* ────────── NIEZALOGOWANY ────────── */
-  if (!isAuthenticated) {
+  if (!effectivelyAuthenticated) {
     return (
       <div style={{ flex: 1, overflow: 'auto', background: t.bg }}>
         {/* Hero */}
