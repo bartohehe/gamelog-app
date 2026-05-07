@@ -3,7 +3,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: http://localhost:8081
+        VITE_API_URL: ${VITE_API_URL:-}
     container_name: gamelog-frontend
     ports:
       - "8080:80"
