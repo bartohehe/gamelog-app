@@ -51,8 +51,10 @@ services:
     networks:
       - gamelog-network
     depends_on:
-      - gamelog-db
-      - redis
+      gamelog-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   gamelog-db:
     image: postgres:16-alpine
@@ -68,6 +70,12 @@ services:
       - sql-data:/var/lib/postgresql/data
     networks:
       - gamelog-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d GameLog"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
