@@ -34,10 +34,10 @@ services:
     container_name: gamelog-backend
     environment:
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=gamelog-db;Database=GameLog;Username=postgres;Password=StrongPassword123!
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - ConnectionStrings__DefaultConnection=Host=gamelog-db;Database=GameLog;Username=postgres;Password=${DB_PASSWORD:-StrongPassword123!}
       - ConnectionStrings__Redis=redis:6379
-      - JwtSettings__Secret=local-docker-secret-key-minimum-32-characters!!
+      - JwtSettings__Secret=${JWT_SECRET:-local-docker-secret-key-minimum-32-characters!!}
       - ExternalApis__Igdb__ClientId=${IGDB_CLIENT_ID:-}
       - ExternalApis__Igdb__ClientSecret=${IGDB_CLIENT_SECRET:-}
       - Riot__ApiKey=${RIOT_API_KEY:-}
@@ -62,10 +62,8 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "StrongPassword123!"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-StrongPassword123!}"
       POSTGRES_DB: GameLog
-    ports:
-      - "5432:5432"
     volumes:
       - sql-data:/var/lib/postgresql/data
     networks:
@@ -81,8 +79,6 @@ services:
     image: redis:7-alpine
     container_name: gamelog-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     networks:
       - gamelog-network
 

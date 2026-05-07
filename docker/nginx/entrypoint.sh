@@ -50,7 +50,13 @@ while true; do
     certbot renew \
         --quiet \
         --webroot \
-        --webroot-path=/var/www/certbot
+        --webroot-path=/var/www/certbot \
+    || echo "[certbot] WARNING: renewal failed — cert unchanged, will retry in 12h"
     nginx -s reload
+    # Guard: exit if nginx died so Docker restarts the container
+    if ! kill -0 $NGINX_PID 2>/dev/null; then
+        echo "[nginx] nginx process died unexpectedly, exiting"
+        exit 1
+    fi
     echo "[nginx] Config reloaded after renewal check"
 done
