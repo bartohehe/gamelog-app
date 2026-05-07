@@ -3,7 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-ARG VITE_API_URL=http://localhost:8081
+# Empty by default — when running behind nginx the API is at /api/ (same origin).
+# For local dev outside Docker set VITE_API_URL=http://localhost:8081 in .env.local
+ARG VITE_API_URL=
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
