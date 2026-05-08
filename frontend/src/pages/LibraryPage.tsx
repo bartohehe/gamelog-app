@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getLibrary } from '../services/libraryService';
+import { getLibrary, removeFromLibrary } from '../services/libraryService';
 import { useTheme } from '../contexts/ThemeContext';
 import Cover from '../components/Cover';
 import StatusBadge from '../components/StatusBadge';
@@ -18,13 +18,12 @@ const FILTER_OPTIONS: { value: GameStatus | 'All'; label: string }[] = [
 type SortKey = 'title' | 'score' | 'date';
 type ViewMode = 'grid' | 'list';
 
-function GridCard({ game, onClick }: { game: UserGameDto; onClick: () => void }) {
+function GridCard({ game, onClick, onRemove }: { game: UserGameDto; onClick: () => void; onRemove: () => void }) {
   const { t } = useTheme();
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -36,9 +35,10 @@ function GridCard({ game, onClick }: { game: UserGameDto; onClick: () => void })
         transition: 'all 0.15s',
         transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
         boxShadow: hovered ? `0 8px 24px ${t.accentGlow}` : 'none',
+        position: 'relative',
       }}
     >
-      <div style={{ height: 215, position: 'relative' }}>
+      <div onClick={onClick} style={{ height: 215, position: 'relative' }}>
         <Cover title={game.title} coverImageUrl={game.coverImageUrl} />
         <div style={{ position: 'absolute', top: 7, right: 7 }}>
           <StatusBadge status={game.status} small />
@@ -49,33 +49,47 @@ function GridCard({ game, onClick }: { game: UserGameDto; onClick: () => void })
           </div>
         )}
       </div>
-      <div style={{ padding: '9px 11px' }}>
-        <div
-          style={{
-            fontWeight: 600,
-            fontSize: 12.5,
-            color: t.text,
-            lineHeight: 1.3,
-            marginBottom: 2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
+      <div onClick={onClick} style={{ padding: '9px 11px 9px' }}>
+        <div style={{ fontWeight: 600, fontSize: 12.5, color: t.text, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {game.title}
         </div>
       </div>
+      {/* Remove button */}
+      <button
+        onClick={e => { e.stopPropagation(); onRemove(); }}
+        style={{
+          position: 'absolute',
+          top: 6,
+          left: 6,
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          background: 'rgba(0,0,0,0.65)',
+          backdropFilter: 'blur(4px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          color: '#fff',
+          fontSize: 12,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: hovered ? 1 : 0,
+          transition: 'opacity 0.15s',
+          padding: 0,
+          lineHeight: 1,
+        }}
+        title="Usuń z biblioteki"
+      >✕</button>
     </div>
   );
 }
 
-function ListCard({ game, onClick }: { game: UserGameDto; onClick: () => void }) {
+function ListCard({ game, onClick, onRemove }: { game: UserGameDto; onClick: () => void; onRemove: () => void }) {
   const { t } = useTheme();
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -86,14 +100,13 @@ function ListCard({ game, onClick }: { game: UserGameDto; onClick: () => void })
         display: 'flex',
         alignItems: 'center',
         gap: 14,
-        cursor: 'pointer',
         transition: 'all 0.15s',
       }}
     >
-      <div style={{ width: 40, height: 54, borderRadius: 5, overflow: 'hidden', flexShrink: 0 }}>
+      <div onClick={onClick} style={{ width: 40, height: 54, borderRadius: 5, overflow: 'hidden', flexShrink: 0, cursor: 'pointer' }}>
         <Cover title={game.title} coverImageUrl={game.coverImageUrl} />
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div onClick={onClick} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
         <div style={{ fontWeight: 600, color: t.text, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {game.title}
         </div>
@@ -101,6 +114,23 @@ function ListCard({ game, onClick }: { game: UserGameDto; onClick: () => void })
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <StatusBadge status={game.status} small />
         <ScoreBadge score={game.score} size="sm" />
+        <button
+          onClick={e => { e.stopPropagation(); onRemove(); }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: t.textFaint,
+            fontSize: 14,
+            cursor: 'pointer',
+            padding: '4px 6px',
+            borderRadius: 6,
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.15s, color 0.15s',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#ef4444'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = t.textFaint; }}
+          title="Usuń z biblioteki"
+        >✕</button>
       </div>
     </div>
   );
@@ -121,6 +151,12 @@ export default function LibraryPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const handleRemove = async (game: UserGameDto) => {
+    if (!confirm(`Usunąć „${game.title}" z biblioteki?`)) return;
+    await removeFromLibrary(game.id).catch(() => {});
+    setGames(prev => prev.filter(g => g.id !== game.id));
+  };
 
   const filtered = (filter === 'All' ? games : games.filter(g => g.status === filter))
     .slice()
@@ -301,7 +337,7 @@ export default function LibraryPage() {
             }}
           >
             {filtered.map(game => (
-              <GridCard key={game.id} game={game} onClick={() => navigate(`/game/${game.igdbId}`)} />
+              <GridCard key={game.id} game={game} onClick={() => navigate(`/game/${game.igdbId}`)} onRemove={() => handleRemove(game)} />
             ))}
           </div>
         )}
@@ -310,7 +346,7 @@ export default function LibraryPage() {
         {view === 'list' && filtered.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {filtered.map(game => (
-              <ListCard key={game.id} game={game} onClick={() => navigate(`/game/${game.igdbId}`)} />
+              <ListCard key={game.id} game={game} onClick={() => navigate(`/game/${game.igdbId}`)} onRemove={() => handleRemove(game)} />
             ))}
           </div>
         )}

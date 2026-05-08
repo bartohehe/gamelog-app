@@ -3,7 +3,21 @@
     "allow": [
       "Bash(dotnet test *)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git check-ignore *)",
+      "Bash(git worktree *)",
+      "Bash(dotnet add *)",
+      "Bash(dotnet build *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git show *)",
+      "Bash(dotnet package *)",
+      "Bash(dotnet ef *)",
+      "Bash(npx tsc *)",
+      "Bash(npx vite *)",
+      "Bash(./node_modules/.bin/tsc -b)",
+      "Bash(./node_modules/.bin/vite build *)",
+      "Bash(docker compose *)"
     ]
   }
 }

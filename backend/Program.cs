@@ -63,6 +63,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IIgdbService, IgdbService>();
+builder.Services.AddHttpClient<ITranslationService, TranslationService>();
 builder.Services.AddHttpClient<IRiotService, RiotService>();
 builder.Services.AddHttpClient<ISteamService, SteamService>();
 

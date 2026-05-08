@@ -7,4 +7,9 @@ public class GameDto
     public string CoverImageUrl { get; set; } = string.Empty;
     public int? ReleaseYear { get; set; }
     public List<string> Genres { get; set; } = new();
+    public string? Summary { get; set; }
+    public double? Rating { get; set; }
+    public int? RatingCount { get; set; }
+    public string? Developer { get; set; }
+    public List<string> Platforms { get; set; } = new();
 }

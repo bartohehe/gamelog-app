@@ -4,7 +4,9 @@ using System.Text.Json.Serialization;
 using CloudBackend.Data;
 using CloudBackend.DTOs.Games;
 using CloudBackend.Models;
+using CloudBackend.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CloudBackend.Services;
 
@@ -15,16 +17,20 @@ public class IgdbService : IIgdbService
     private readonly string _clientSecret;
     private readonly AppDbContext _context;
     private readonly ICacheService _cache;
+    private readonly ITranslationService _translation;
+    private readonly bool _translationEnabled;
     private static string? _accessToken;
     private static DateTime _tokenExpiry = DateTime.MinValue;
 
-    public IgdbService(HttpClient http, IConfiguration config, AppDbContext context, ICacheService cache)
+    public IgdbService(HttpClient http, IConfiguration config, AppDbContext context, ICacheService cache, ITranslationService translation, IOptions<FeatureFlags> flags)
     {
         _http = http;
         _clientId = config["ExternalApis:Igdb:ClientId"] ?? "";
         _clientSecret = config["ExternalApis:Igdb:ClientSecret"] ?? "";
         _context = context;
         _cache = cache;
+        _translation = translation;
+        _translationEnabled = flags.Value.TranslationEnabled;
     }
 
     private async Task EnsureTokenAsync()
@@ -58,11 +64,19 @@ public class IgdbService : IIgdbService
             () => PostQueryAsync($"search \"{query}\"; fields id,name,cover.image_id,first_release_date,genres.name; limit 12;"),
             TimeSpan.FromMinutes(15));
 
-    public Task<List<GameDto>?> GetPopularGamesAsync() =>
-        _cache.GetOrSetAsync(
-            "igdb:popular",
-            () => PostQueryAsync("fields id,name,cover.image_id,first_release_date,genres.name; where rating_count > 100; sort rating desc; limit 12;"),
+    public Task<List<GameDto>?> GetPopularGamesAsync()
+    {
+        var monthAgo = DateTimeOffset.UtcNow.AddDays(-30).ToUnixTimeSeconds();
+        var now      = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var cacheKey = $"igdb:popular:recent:{DateTime.UtcNow:yyyyMMdd}";
+        return _cache.GetOrSetAsync(
+            cacheKey,
+            () => PostQueryAsync(
+                $"fields id,name,cover.image_id,first_release_date,genres.name; " +
+                $"where first_release_date >= {monthAgo} & first_release_date <= {now} & rating_count > 0; " +
+                $"sort rating desc; limit 12;"),
             TimeSpan.FromHours(6));
+    }
 
     public Task<List<GameDto>?> GetGamesByGenreAsync(string genre)
     {
@@ -86,8 +100,11 @@ public class IgdbService : IIgdbService
             $"igdb:game:{igdbId}",
             async () =>
             {
-                var results = await PostQueryAsync($"where id = {igdbId}; fields id,name,cover.image_id,first_release_date,genres.name;");
-                return results.FirstOrDefault()!;
+                var results = await PostQueryAsync($"where id = {igdbId}; fields id,name,cover.image_id,first_release_date,genres.name,summary,rating,rating_count,involved_companies.developer,involved_companies.company.name,platforms.name;");
+                var dto = results.FirstOrDefault();
+                if (dto != null && _translationEnabled && !string.IsNullOrEmpty(dto.Summary))
+                    dto.Summary = await _translation.TranslateToPolishAsync(dto.Summary) ?? dto.Summary;
+                return dto!;
             },
             TimeSpan.FromHours(24));
     }
@@ -106,7 +123,12 @@ public class IgdbService : IIgdbService
             Title = dto.Title,
             CoverImageUrl = dto.CoverImageUrl,
             ReleaseYear = dto.ReleaseYear,
-            Genres = JsonSerializer.Serialize(dto.Genres)
+            Genres = JsonSerializer.Serialize(dto.Genres),
+            Summary = dto.Summary,
+            Rating = dto.Rating,
+            RatingCount = dto.RatingCount,
+            Developer = dto.Developer,
+            Platforms = JsonSerializer.Serialize(dto.Platforms),
         };
         _context.Games.Add(game);
         await _context.SaveChangesAsync();
@@ -123,7 +145,12 @@ public class IgdbService : IIgdbService
         ReleaseYear = g.FirstReleaseDate.HasValue
             ? DateTimeOffset.FromUnixTimeSeconds(g.FirstReleaseDate.Value).Year
             : null,
-        Genres = g.Genres?.Select(x => x.Name).ToList() ?? new()
+        Genres = g.Genres?.Select(x => x.Name).ToList() ?? new(),
+        Summary = g.Summary,
+        Rating = g.Rating.HasValue ? Math.Round(g.Rating.Value, 1) : null,
+        RatingCount = g.RatingCount,
+        Developer = g.InvolvedCompanies?.FirstOrDefault(c => c.Developer)?.Company?.Name,
+        Platforms = g.Platforms?.Select(p => p.Name).ToList() ?? new(),
     };
 
     private static GameDto MapCachedGame(Game g) => new()
@@ -132,7 +159,12 @@ public class IgdbService : IIgdbService
         Title = g.Title,
         CoverImageUrl = g.CoverImageUrl,
         ReleaseYear = g.ReleaseYear,
-        Genres = JsonSerializer.Deserialize<List<string>>(g.Genres) ?? new()
+        Genres = JsonSerializer.Deserialize<List<string>>(g.Genres) ?? new(),
+        Summary = g.Summary,
+        Rating = g.Rating,
+        RatingCount = g.RatingCount,
+        Developer = g.Developer,
+        Platforms = string.IsNullOrEmpty(g.Platforms) ? new() : JsonSerializer.Deserialize<List<string>>(g.Platforms) ?? new(),
     };
 
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
@@ -150,6 +182,11 @@ public class IgdbService : IIgdbService
         public IgdbCover? Cover { get; set; }
         [JsonPropertyName("first_release_date")] public long? FirstReleaseDate { get; set; }
         public List<IgdbGenre>? Genres { get; set; }
+        public string? Summary { get; set; }
+        public double? Rating { get; set; }
+        [JsonPropertyName("rating_count")] public int? RatingCount { get; set; }
+        [JsonPropertyName("involved_companies")] public List<IgdbInvolvedCompany>? InvolvedCompanies { get; set; }
+        public List<IgdbPlatform>? Platforms { get; set; }
     }
 
     private class IgdbCover
@@ -158,6 +195,22 @@ public class IgdbService : IIgdbService
     }
 
     private class IgdbGenre
+    {
+        public string Name { get; set; } = "";
+    }
+
+    private class IgdbInvolvedCompany
+    {
+        public bool Developer { get; set; }
+        public IgdbCompany? Company { get; set; }
+    }
+
+    private class IgdbCompany
+    {
+        public string Name { get; set; } = "";
+    }
+
+    private class IgdbPlatform
     {
         public string Name { get; set; } = "";
     }

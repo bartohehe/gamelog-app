@@ -6,6 +6,11 @@ export interface GameDto {
   coverImageUrl: string;
   releaseYear?: number;
   genres: string[];
+  summary?: string;
+  rating?: number;
+  ratingCount?: number;
+  developer?: string;
+  platforms?: string[];
 }
 
 export interface UserGameDto {

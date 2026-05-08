@@ -1,6 +1,8 @@
 .worktrees/
 bin/
 obj/
+**/bin/
+**/obj/
 .claude/
 docs/TODO
 

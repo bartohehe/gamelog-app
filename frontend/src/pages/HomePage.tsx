@@ -4,10 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFeatureFlags } from '../contexts/FeatureFlagsContext';
 import { getMyStats } from '../services/statsService';
-import { getTopGames } from '../services/statsService';
 import { getPopularGames, getGamesByGenre } from '../services/gamesService';
 import { getLibrary } from '../services/libraryService';
-import type { UserStatsDto, TopGameDto, GameDto, UserGameDto } from '../types';
+import type { UserStatsDto, GameDto, UserGameDto } from '../types';
 import Cover from '../components/Cover';
 import ScoreBadge from '../components/ScoreBadge';
 import SectionHeader from '../components/SectionHeader';
@@ -18,8 +17,8 @@ function GameRow({
   onClickGame,
   cardHeight = 180,
 }: {
-  games: (TopGameDto | GameDto | UserGameDto)[];
-  onClickGame: (game: TopGameDto | GameDto | UserGameDto) => void;
+  games: (GameDto | UserGameDto)[];
+  onClickGame: (game: GameDto | UserGameDto) => void;
   cardHeight?: number;
 }) {
   const { t } = useTheme();
@@ -27,7 +26,7 @@ function GameRow({
     <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'thin' }}>
       {games.map(game => {
         const igdbId = game.igdbId;
-        const score = 'averageScore' in game ? game.averageScore : ('score' in game ? game.score : undefined);
+        const score: number | undefined = 'score' in game ? (game as UserGameDto).score : undefined;
         return (
           <div
             key={igdbId}
@@ -68,7 +67,7 @@ function GameRow({
 }
 
 /* ── Trending horizontal card ── */
-function TrendingCard({ game, onClick }: { game: TopGameDto; onClick: () => void }) {
+function TrendingCard({ game, onClick }: { game: GameDto; onClick: () => void }) {
   const { t } = useTheme();
   return (
     <div
@@ -97,10 +96,12 @@ function TrendingCard({ game, onClick }: { game: TopGameDto; onClick: () => void
         <div style={{ fontWeight: 700, color: t.text, fontSize: 13, fontFamily: 'Syne, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>
           {game.title}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {game.averageScore > 0 && <ScoreBadge score={Math.round(game.averageScore)} size="sm" />}
-          <span style={{ fontSize: 11, color: t.textMuted }}>{game.reviewCount} ocen</span>
-        </div>
+        {game.releaseYear && (
+          <span style={{ fontSize: 11, color: t.textMuted }}>{game.releaseYear}</span>
+        )}
+        {game.genres?.length > 0 && (
+          <span style={{ fontSize: 11, color: t.textFaint, marginTop: 2 }}>{game.genres[0]}</span>
+        )}
       </div>
       {/* Right: cover */}
       <div style={{ width: 90, flexShrink: 0 }}>
@@ -118,7 +119,6 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const [stats, setStats] = useState<UserStatsDto | null>(null);
-  const [topGames, setTopGames] = useState<TopGameDto[]>([]);
   const [popularGames, setPopularGames] = useState<GameDto[]>([]);
   const [library, setLibrary] = useState<UserGameDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +127,6 @@ export default function HomePage() {
 
   useEffect(() => {
     const base = [
-      getTopGames().then(setTopGames).catch(() => {}),
       getPopularGames().then(setPopularGames).catch(() => {}),
     ];
     const authed = effectivelyAuthenticated
@@ -197,11 +196,11 @@ export default function HomePage() {
         </div>
 
         {/* Top gry */}
-        {topGames.length > 0 && (
+        {popularGames.length > 0 && (
           <div style={{ padding: '0 40px 40px', marginTop: 32 }}>
-            <SectionHeader title="Najwyżej oceniane" sub="Gry z najlepszymi recenzjami" />
+            <SectionHeader title="Popularne teraz" sub="Najlepiej oceniane gry według IGDB" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 40 }}>
-              {topGames.slice(0, 6).map(game => (
+              {popularGames.slice(0, 6).map(game => (
                 <TrendingCard key={game.igdbId} game={game} onClick={() => navigate('/login')} />
               ))}
             </div>
@@ -212,10 +211,10 @@ export default function HomePage() {
   }
 
   /* ────────── ZALOGOWANY ────────── */
-  const hero = topGames[0] ?? null;
+  const hero = popularGames[0] ?? null;
   const inProgress = library.filter(g => g.status === 'InProgress');
-  const trendingGrid = topGames.slice(0, 4);
-  const discoverRow = popularGames.slice(0, 8);
+  const trendingGrid = popularGames.slice(1, 5);
+  const discoverRow = popularGames.slice(5);
   const recommendedSub = recommendedGenre
     ? `Najnowsze premiery z gatunku ${recommendedGenre}`
     : 'Najnowsze gry dopasowane do Twoich upodobań';
@@ -247,7 +246,6 @@ export default function HomePage() {
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 10, fontWeight: 600 }}>✦ Popularne teraz</div>
             <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 42, fontWeight: 900, color: '#fff', lineHeight: 1.05, marginBottom: 16 }}>{hero.title}</h1>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              {hero.averageScore > 0 && <ScoreBadge score={Math.round(hero.averageScore)} size="lg" />}
               <button
                 onClick={() => navigate(`/game/${hero.igdbId}`)}
                 style={{ padding: '10px 22px', background: t.accent, border: 'none', borderRadius: 9, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: `0 0 24px ${t.accentGlow}` }}
@@ -276,7 +274,7 @@ export default function HomePage() {
             {/* Trending 2×2 grid */}
             {trendingGrid.length > 0 && (
               <>
-                <SectionHeader title="Popularne teraz" sub="Najwyżej oceniane przez społeczność" />
+                <SectionHeader title="Popularne teraz" sub="Najlepiej oceniane gry według IGDB" />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 40 }}>
                   {trendingGrid.map(game => (
                     <TrendingCard key={game.igdbId} game={game} onClick={() => navigate(`/game/${game.igdbId}`)} />
@@ -288,7 +286,7 @@ export default function HomePage() {
             {/* Discover row */}
             {discoverRow.length > 0 && (
               <>
-                <SectionHeader title="Odkryj nowe gry" sub="Przeglądaj popularne tytuły" onMore={() => navigate('/search')} />
+                <SectionHeader title="Odkryj nowe gry" sub="Więcej popularnych tytułów" onMore={() => navigate('/search')} />
                 <GameRow games={discoverRow} onClickGame={g => navigate(`/game/${g.igdbId}`)} />
               </>
             )}

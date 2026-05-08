@@ -8,4 +8,5 @@ public class FeatureFlags
     public bool ReviewsEnabled { get; set; } = true;
     public bool BacklogEnabled { get; set; } = true;
     public bool StatisticsEnabled { get; set; } = false;
+    public bool TranslationEnabled { get; set; } = true;
 }
