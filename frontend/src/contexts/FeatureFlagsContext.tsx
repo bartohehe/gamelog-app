@@ -9,6 +9,7 @@ export interface FeatureFlags {
   backlogEnabled: boolean;
   statisticsEnabled: boolean;
   translationEnabled: boolean;
+  advancedRatingEnabled: boolean;
 }
 
 const defaults: FeatureFlags = {
@@ -19,6 +20,7 @@ const defaults: FeatureFlags = {
   backlogEnabled: true,
   statisticsEnabled: false,
   translationEnabled: true,
+  advancedRatingEnabled: false,
 };
 
 const FeatureFlagsContext = createContext<FeatureFlags>(defaults);

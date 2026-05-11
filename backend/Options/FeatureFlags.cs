@@ -9,4 +9,5 @@ public class FeatureFlags
     public bool BacklogEnabled { get; set; } = true;
     public bool StatisticsEnabled { get; set; } = false;
     public bool TranslationEnabled { get; set; } = true;
+    public bool AdvancedRatingEnabled { get; set; } = false;
 }

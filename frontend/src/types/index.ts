@@ -1,4 +1,4 @@
-export type GameStatus = 'Planned' | 'InProgress' | 'Completed' | 'Abandoned';
+export type GameStatus = 'Planned' | 'InProgress' | 'Completed' | 'Abandoned' | 'Wishlist' | 'OnHold';
 
 export interface GameDto {
   igdbId: number;
@@ -60,4 +60,71 @@ export interface TopGameDto {
   coverImageUrl: string;
   averageScore: number;
   reviewCount: number;
+}
+
+export interface CategoryRankingItem {
+  userGameId: number;
+  igdbId: number;
+  title: string;
+  coverImageUrl: string;
+  position: number;
+}
+
+// ─── Media ────────────────────────────────────────────────────────────────────
+
+export type MediaType = 'Film' | 'Serial' | 'Anime';
+export type MediaWatchStatus = 'Watched' | 'Watching' | 'Backlog';
+
+export interface UserMediaDto {
+  id: number;
+  title: string;
+  type: MediaType;
+  year: number;
+  genres: string[];
+  creator: string;
+  status: MediaWatchStatus;
+  score?: number;
+  runtime?: string;
+  episodes?: number;
+  watchedEpisodes?: number;
+  coverImageUrl?: string;
+  review: string;
+  addedAt: string;
+  updatedAt: string;
+}
+
+export interface AddMediaDto {
+  title: string;
+  type: MediaType;
+  year: number;
+  genres: string[];
+  creator: string;
+  status: MediaWatchStatus;
+  score?: number;
+  runtime?: string;
+  episodes?: number;
+  watchedEpisodes?: number;
+  coverImageUrl?: string;
+  review?: string;
+}
+
+export interface UpdateMediaDto {
+  status: MediaWatchStatus;
+  score?: number;
+  watchedEpisodes?: number;
+  review?: string;
+}
+
+/** A title from the static search catalogue (not yet in user's library). */
+export interface MediaCatalogItem {
+  id: number;
+  title: string;
+  type: MediaType;
+  year: number;
+  genres: string[];
+  creator: string;
+  runtime?: string;        // films
+  episodes?: number;       // serial/anime total
+  criticScore?: number;
+  popularity: number;
 }

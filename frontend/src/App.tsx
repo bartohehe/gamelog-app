@@ -15,6 +15,8 @@ const LibraryPage = lazy(() => import('./pages/LibraryPage'));
 const GameDetailPage = lazy(() => import('./pages/GameDetailPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const MultiplayerPage = lazy(() => import('./pages/MultiplayerPage'));
+const MediaPage = lazy(() => import('./pages/MediaPage'));
+const MediaSearchPage = lazy(() => import('./pages/MediaSearchPage'));
 
 function LoadingSpinner() {
   const { t } = useTheme();
@@ -70,6 +72,8 @@ function AppShell() {
             <Route path="/library" element={<Guard><LibraryPage /></Guard>} />
             <Route path="/game/:igdbId" element={<Guard><GameDetailPage /></Guard>} />
             <Route path="/profile" element={<Guard><ProfilePage /></Guard>} />
+            <Route path="/media" element={<Guard><MediaPage /></Guard>} />
+            <Route path="/media-search" element={<Guard><MediaSearchPage /></Guard>} />
             {multiplayerEnabled && (
               <Route path="/multiplayer" element={<Guard><MultiplayerPage /></Guard>} />
             )}

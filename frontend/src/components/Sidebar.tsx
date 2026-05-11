@@ -9,12 +9,18 @@ const THEME_DOTS: Record<ThemeName, string> = {
   neon: '#7c3aed',
   crimson: '#dc2626',
   ocean: '#0ea5e9',
+  editorial: '#d97706',
+  terminal: '#22c55e',
+  cosmic: '#e879f9',
 };
 
 const THEME_LABELS: Record<ThemeName, string> = {
   neon: 'Neon',
   crimson: 'Crimson',
   ocean: 'Ocean',
+  editorial: 'Editorial',
+  terminal: 'Terminal',
+  cosmic: 'Cosmic',
 };
 
 const NAV_ITEMS = [
@@ -52,6 +58,18 @@ const NAV_ITEMS = [
     ),
   },
   {
+    id: 'media',
+    label: 'Media',
+    path: '/media',
+    svg: (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <rect x="2" y="3" width="14" height="10" rx="1.5" />
+        <path d="M7 6l4 2-4 2z" fill="currentColor" stroke="none" />
+        <line x1="6" y1="16" x2="12" y2="16" />
+      </svg>
+    ),
+  },
+  {
     id: 'multiplayer',
     label: 'Multiplayer',
     path: '/multiplayer',
@@ -78,10 +96,12 @@ const NAV_ITEMS = [
 ];
 
 const STATUS_ITEMS = [
-  { key: 'Planned',    label: 'Planowane',  colorKey: 'statusPlanned'    as const },
-  { key: 'InProgress', label: 'W trakcie',  colorKey: 'statusInProgress' as const },
-  { key: 'Completed',  label: 'Ukończone',  colorKey: 'statusCompleted'  as const },
-  { key: 'Abandoned',  label: 'Porzucone',  colorKey: 'statusAbandoned'  as const },
+  { key: 'Planned',    label: 'Planowane',     colorKey: 'statusPlanned'    as const },
+  { key: 'InProgress', label: 'W trakcie',     colorKey: 'statusInProgress' as const },
+  { key: 'Completed',  label: 'Ukończone',     colorKey: 'statusCompleted'  as const },
+  { key: 'Abandoned',  label: 'Porzucone',     colorKey: 'statusAbandoned'  as const },
+  { key: 'Wishlist',   label: 'Lista życzeń',  colorKey: 'statusWishlist'   as const },
+  { key: 'OnHold',     label: 'Wstrzymane',    colorKey: 'statusOnHold'     as const },
 ];
 
 export default function Sidebar() {

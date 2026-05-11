@@ -13,6 +13,8 @@ const FILTER_OPTIONS: { value: GameStatus | 'All'; label: string }[] = [
   { value: 'Planned', label: 'Planowane' },
   { value: 'Completed', label: 'Ukończone' },
   { value: 'Abandoned', label: 'Porzucone' },
+  { value: 'Wishlist', label: 'Lista życzeń' },
+  { value: 'OnHold', label: 'Wstrzymane' },
 ];
 
 type SortKey = 'title' | 'score' | 'date';

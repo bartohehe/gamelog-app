@@ -2,10 +2,12 @@ import type { GameStatus } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 
 const STATUS_META: Record<GameStatus, { label: string; icon: string }> = {
-  Planned:    { label: 'Planowane',  icon: '◷' },
-  InProgress: { label: 'W trakcie', icon: '▶' },
-  Completed:  { label: 'Ukończone', icon: '✓' },
-  Abandoned:  { label: 'Porzucone', icon: '✕' },
+  Planned:    { label: 'Planowane',       icon: '◷' },
+  InProgress: { label: 'W trakcie',      icon: '▶' },
+  Completed:  { label: 'Ukończone',      icon: '✓' },
+  Abandoned:  { label: 'Porzucone',      icon: '✕' },
+  Wishlist:   { label: 'Lista życzeń',   icon: '♡' },
+  OnHold:     { label: 'Wstrzymane',     icon: '⏸' },
 };
 
 interface Props {
@@ -21,6 +23,8 @@ export default function StatusBadge({ status, small }: Props) {
     InProgress: t.statusInProgress,
     Completed:  t.statusCompleted,
     Abandoned:  t.statusAbandoned,
+    Wishlist:   t.statusWishlist,
+    OnHold:     t.statusOnHold,
   };
 
   const color = colorMap[status];

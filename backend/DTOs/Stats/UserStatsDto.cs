@@ -7,5 +7,7 @@ public class UserStatsDto
     public int InProgressCount { get; set; }
     public int CompletedCount { get; set; }
     public int AbandonedCount { get; set; }
+    public int WishlistCount { get; set; }
+    public int OnHoldCount { get; set; }
     public double? AverageScore { get; set; }
 }

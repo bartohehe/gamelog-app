@@ -5,5 +5,7 @@ public enum GameStatus
     Planned,
     InProgress,
     Completed,
-    Abandoned
+    Abandoned,
+    Wishlist,
+    OnHold
 }

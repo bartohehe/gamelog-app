@@ -38,6 +38,8 @@ public class StatsController : ControllerBase
             InProgressCount = items.Count(ug => ug.Status == GameStatus.InProgress),
             CompletedCount = items.Count(ug => ug.Status == GameStatus.Completed),
             AbandonedCount = items.Count(ug => ug.Status == GameStatus.Abandoned),
+            WishlistCount = items.Count(ug => ug.Status == GameStatus.Wishlist),
+            OnHoldCount = items.Count(ug => ug.Status == GameStatus.OnHold),
             AverageScore = scored.Any() ? scored.Average(ug => ug.Score!.Value) : null
         });
     }

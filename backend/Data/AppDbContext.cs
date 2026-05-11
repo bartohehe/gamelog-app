@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<Game> Games { get; set; }
     public DbSet<UserGame> UserGames { get; set; }
     public DbSet<MultiplayerEntry> MultiplayerEntries { get; set; }
+    public DbSet<CategoryRanking> CategoryRankings => Set<CategoryRanking>();
+    public DbSet<UserMedia> UserMedia => Set<UserMedia>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,5 +41,28 @@ public class AppDbContext : DbContext
             .HasOne(m => m.User)
             .WithMany()
             .HasForeignKey(m => m.UserId);
+
+        modelBuilder.Entity<CategoryRanking>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId);
+
+        modelBuilder.Entity<CategoryRanking>()
+            .HasOne(r => r.UserGame)
+            .WithMany()
+            .HasForeignKey(r => r.UserGameId);
+
+        modelBuilder.Entity<CategoryRanking>()
+            .HasIndex(r => new { r.UserId, r.CategoryId, r.UserGameId })
+            .IsUnique();
+
+        modelBuilder.Entity<UserMedia>()
+            .HasOne(m => m.User)
+            .WithMany()
+            .HasForeignKey(m => m.UserId);
+
+        modelBuilder.Entity<UserMedia>()
+            .HasIndex(m => new { m.UserId, m.Title, m.Type })
+            .IsUnique();
     }
 }

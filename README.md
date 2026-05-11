@@ -98,16 +98,3 @@ Flagi sterują dostępnością funkcji w czasie działania — zmiana w `.env` i
 | `BACKLOG_ENABLED` | `true` | Zarządzanie backlogiem |
 | `STATISTICS_ENABLED` | `false` | Rozszerzone statystyki użytkownika |
 | `TRANSLATION_ENABLED` | `true` | Tłumaczenie opisów gier na polski |
-
-## Architektura (mapowanie Azure)
-
-Projekt zaprojektowany z myślą o PaaS w Azure — każdy komponent ma bezpośredni odpowiednik:
-
-| Komponent lokalny | Usługa Azure |
-| :--- | :--- |
-| React (Vite / nginx) | Azure Static Web Apps |
-| ASP.NET Core API | Azure App Service |
-| PostgreSQL | Azure Database for PostgreSQL |
-| Redis | Azure Cache for Redis |
-| Azure Key Vault | Obsługiwany przez `DefaultAzureCredential` |
-

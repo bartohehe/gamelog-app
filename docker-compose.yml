@@ -47,6 +47,7 @@ services:
       - FeatureFlags__BacklogEnabled=${BACKLOG_ENABLED:-true}
       - FeatureFlags__StatisticsEnabled=${STATISTICS_ENABLED:-false}
       - FeatureFlags__TranslationEnabled=${TRANSLATION_ENABLED:-true}
+      - FeatureFlags__AdvancedRatingEnabled=${ADVANCED_RATING_ENABLED:-false}
     networks:
       - gamelog-network
     depends_on:

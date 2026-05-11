@@ -3,15 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getGameById } from '../services/gamesService';
 import { getLibrary, updateLibraryItem, removeFromLibrary } from '../services/libraryService';
 import { useTheme } from '../contexts/ThemeContext';
+import { useFeatureFlags } from '../contexts/FeatureFlagsContext';
 import Cover from '../components/Cover';
 import StatusBadge from '../components/StatusBadge';
 import ScoreSlider from '../components/ScoreSlider';
 import AddToLibraryModal from '../components/AddToLibraryModal';
+import RankingRatingModal from '../components/RankingRatingModal';
 import type { GameDto, UserGameDto, GameStatus, UpdateLibraryItemDto } from '../types';
 
 const STATUSES: { value: GameStatus; label: string }[] = [
+  { value: 'Wishlist', label: 'Lista życzeń' },
   { value: 'Planned', label: 'Planowane' },
   { value: 'InProgress', label: 'W trakcie' },
+  { value: 'OnHold', label: 'Wstrzymane' },
   { value: 'Completed', label: 'Ukończone' },
   { value: 'Abandoned', label: 'Porzucone' },
 ];
@@ -31,10 +35,12 @@ export default function GameDetailPage() {
   const { igdbId } = useParams<{ igdbId: string }>();
   const navigate = useNavigate();
   const { t } = useTheme();
+  const { advancedRatingEnabled, reviewsEnabled } = useFeatureFlags();
 
   const [game, setGame] = useState<GameDto | null>(null);
   const [libraryItem, setLibraryItem] = useState<UserGameDto | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<UpdateLibraryItemDto>({
     status: 'Planned',
@@ -168,7 +174,30 @@ export default function GameDetailPage() {
                   </div>
                 </div>
 
-                <ScoreSlider value={form.score} onChange={(val) => setForm(f => ({ ...f, score: val === 0 ? undefined : val }))} accentColor={t.accent} />
+                {reviewsEnabled && advancedRatingEnabled ? (
+                  <button
+                    onClick={() => setShowRatingModal(true)}
+                    style={{
+                      width: '100%',
+                      padding: '11px 16px',
+                      background: t.bgElevated,
+                      border: `1px solid ${t.border}`,
+                      borderRadius: 8,
+                      color: t.text,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = t.accent; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = t.border; }}
+                  >
+                    {form.score ? `Ocena: ${form.score}/100 — Edytuj ranking` : 'Oceń przez ranking'}
+                  </button>
+                ) : (
+                  <ScoreSlider value={form.score} onChange={(val) => setForm(f => ({ ...f, score: val === 0 ? undefined : val }))} accentColor={t.accent} />
+                )}
 
                 <div style={{ marginTop: 18, marginBottom: 14 }}>
                   <label style={{ fontSize: 12, color: t.textMuted, display: 'block', marginBottom: 8 }}>Status</label>
@@ -279,6 +308,18 @@ export default function GameDetailPage() {
               setLibraryItem(item);
               if (item) setForm({ status: item.status, platform: item.platform, score: item.score, review: item.review ?? '' });
             }).catch(() => {});
+          }}
+        />
+      )}
+
+      {showRatingModal && libraryItem && (
+        <RankingRatingModal
+          game={libraryItem}
+          onClose={() => setShowRatingModal(false)}
+          onSaved={async (score) => {
+            const updated = await updateLibraryItem(libraryItem.id, { ...form, score });
+            setLibraryItem(updated);
+            setForm(f => ({ ...f, score }));
           }}
         />
       )}

@@ -5,8 +5,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import Cover from './Cover';
 
 const STATUSES: { value: GameStatus; label: string }[] = [
+  { value: 'Wishlist', label: 'Lista życzeń' },
   { value: 'Planned', label: 'Planowane' },
   { value: 'InProgress', label: 'W trakcie' },
+  { value: 'OnHold', label: 'Wstrzymane' },
   { value: 'Completed', label: 'Ukończone' },
   { value: 'Abandoned', label: 'Porzucone' },
 ];
@@ -131,7 +133,7 @@ export default function AddToLibraryModal({ game, onClose, onAdded }: Props) {
           {/* Status */}
           <div>
             <label style={{ fontSize: 12, color: t.textMuted, display: 'block', marginBottom: 8 }}>Status</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {STATUSES.map(s => {
                 const active = status === s.value;
                 return (
