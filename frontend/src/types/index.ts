@@ -128,3 +128,18 @@ export interface MediaCatalogItem {
   criticScore?: number;
   popularity: number;
 }
+
+/** Result from the backend /api/mediasearch (TMDB + Jikan). */
+export interface MediaSearchResultDto {
+  externalId: string;
+  title: string;
+  type: MediaType;
+  year: number;
+  genres: string[];
+  creator: string;
+  coverImageUrl?: string;
+  runtime?: string;
+  episodes?: number;
+  criticScore?: number;
+  popularity: number;
+}

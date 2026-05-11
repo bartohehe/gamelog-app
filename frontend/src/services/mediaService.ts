@@ -1,5 +1,5 @@
 import api from './api';
-import type { UserMediaDto, AddMediaDto, UpdateMediaDto } from '../types';
+import type { UserMediaDto, AddMediaDto, UpdateMediaDto, MediaSearchResultDto } from '../types';
 
 export const getMedia = () =>
   api.get<UserMediaDto[]>('/api/media').then(r => r.data);
@@ -12,3 +12,7 @@ export const updateMedia = (id: number, dto: UpdateMediaDto) =>
 
 export const removeMedia = (id: number) =>
   api.delete(`/api/media/${id}`);
+
+export const searchMedia = (q: string, type = 'all') =>
+  api.get<MediaSearchResultDto[]>('/api/mediasearch', { params: { q, type } })
+    .then(r => r.data);

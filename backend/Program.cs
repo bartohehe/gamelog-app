@@ -66,6 +66,8 @@ builder.Services.AddHttpClient<IIgdbService, IgdbService>();
 builder.Services.AddHttpClient<ITranslationService, TranslationService>();
 builder.Services.AddHttpClient<IRiotService, RiotService>();
 builder.Services.AddHttpClient<ISteamService, SteamService>();
+builder.Services.AddHttpClient<ITmdbService, TmdbService>();
+builder.Services.AddHttpClient<IJikanService, JikanService>();
 
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]
     ?? throw new InvalidOperationException("JwtSettings:Secret not configured.");
