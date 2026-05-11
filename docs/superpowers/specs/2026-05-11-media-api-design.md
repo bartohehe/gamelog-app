@@ -172,17 +172,36 @@ export const searchMedia = (q: string, type = 'all') =>
 
 ---
 
+## Feature Flag
+
+`MediaEnabled` (default: `true`) controls the entire Media section.
+
+| Layer | Change |
+|---|---|
+| `backend/Options/FeatureFlags.cs` | `public bool MediaEnabled { get; set; } = true;` |
+| `frontend/src/contexts/FeatureFlagsContext.tsx` | add `mediaEnabled: boolean` (default `true`) |
+| `frontend/src/components/Sidebar.tsx` | hide Media nav item when `!mediaEnabled` (same pattern as `multiplayer`) |
+| `frontend/src/App.tsx` | wrap `/media` and `/media-search` routes inside `{mediaEnabled && …}` |
+| `.env.example` | `MEDIA_ENABLED=true` |
+| `docker-compose.yml` | `FeatureFlags__MediaEnabled=${MEDIA_ENABLED:-true}` |
+
+---
+
 ## Environment / Docker
 
 **.env.example** — add:
 ```
 # TMDB API key — zarejestruj na https://www.themoviedb.org/settings/api
 TMDB_API_KEY=your_tmdb_api_key_here
+
+# Media section (filmy, seriale, anime)
+MEDIA_ENABLED=true
 ```
 
 **docker-compose.yml** — backend `environment` section, add:
 ```yaml
 - ExternalApis__Tmdb__ApiKey=${TMDB_API_KEY:-}
+- FeatureFlags__MediaEnabled=${MEDIA_ENABLED:-true}
 ```
 
 ---

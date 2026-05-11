@@ -48,6 +48,8 @@ services:
       - FeatureFlags__StatisticsEnabled=${STATISTICS_ENABLED:-false}
       - FeatureFlags__TranslationEnabled=${TRANSLATION_ENABLED:-true}
       - FeatureFlags__AdvancedRatingEnabled=${ADVANCED_RATING_ENABLED:-false}
+      - FeatureFlags__MediaEnabled=${MEDIA_ENABLED:-true}
+      - ExternalApis__Tmdb__ApiKey=${TMDB_API_KEY:-}
     networks:
       - gamelog-network
     depends_on:

@@ -10,4 +10,5 @@ public class FeatureFlags
     public bool StatisticsEnabled { get; set; } = false;
     public bool TranslationEnabled { get; set; } = true;
     public bool AdvancedRatingEnabled { get; set; } = false;
+    public bool MediaEnabled { get; set; } = true;
 }

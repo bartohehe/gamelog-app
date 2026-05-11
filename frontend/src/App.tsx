@@ -40,7 +40,7 @@ function LoadingSpinner() {
 function AppShell() {
   const location = useLocation();
   const { t } = useTheme();
-  const { authEnabled, multiplayerEnabled } = useFeatureFlags();
+  const { authEnabled, multiplayerEnabled, mediaEnabled } = useFeatureFlags();
 
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
@@ -72,8 +72,12 @@ function AppShell() {
             <Route path="/library" element={<Guard><LibraryPage /></Guard>} />
             <Route path="/game/:igdbId" element={<Guard><GameDetailPage /></Guard>} />
             <Route path="/profile" element={<Guard><ProfilePage /></Guard>} />
-            <Route path="/media" element={<Guard><MediaPage /></Guard>} />
-            <Route path="/media-search" element={<Guard><MediaSearchPage /></Guard>} />
+            {mediaEnabled && (
+              <Route path="/media" element={<Guard><MediaPage /></Guard>} />
+            )}
+            {mediaEnabled && (
+              <Route path="/media-search" element={<Guard><MediaSearchPage /></Guard>} />
+            )}
             {multiplayerEnabled && (
               <Route path="/multiplayer" element={<Guard><MultiplayerPage /></Guard>} />
             )}

@@ -108,14 +108,16 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const { t, theme, setTheme } = useTheme();
-  const { multiplayerEnabled, authEnabled } = useFeatureFlags();
+  const { multiplayerEnabled, mediaEnabled, authEnabled } = useFeatureFlags();
   const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
-  const visibleNavItems = NAV_ITEMS.filter(
-    item => item.id !== 'multiplayer' || multiplayerEnabled
-  );
+  const visibleNavItems = NAV_ITEMS.filter(item => {
+    if (item.id === 'multiplayer') return multiplayerEnabled;
+    if (item.id === 'media') return mediaEnabled;
+    return true;
+  });
   // When auth is disabled treat the session as always logged-in
   const effectivelyAuthenticated = !authEnabled || isAuthenticated;
   const displayName = user?.username ?? (!authEnabled ? 'Admin' : 'Gość');
