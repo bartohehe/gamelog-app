@@ -178,6 +178,8 @@ export default function LibraryPage() {
       InProgress: t.statusInProgress,
       Completed: t.statusCompleted,
       Abandoned: t.statusAbandoned,
+      Wishlist: t.statusWishlist,
+      OnHold: t.statusOnHold,
     };
     return map[status];
   };
